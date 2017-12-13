@@ -21,7 +21,7 @@ defmodule XUber.Passenger do
     {:reply, {:ok, trip}, %{state | trip: trip, status: :requesting}}
   end
 
-  def handle_call(:cancel, _from, state) do
+  def handle_call(:cancel, _from, state=%{status: :requesting}) do
     # todo send trip :cancel message
     {:reply, {:ok, state.trip}, %{state | trip: nil, status: :online}}
   end
