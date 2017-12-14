@@ -4,7 +4,7 @@ defmodule XUber.Passenger do
   def start_link(user) do
     state = %{
       user: user,
-      trip: nil,
+      ride: nil,
       driver: nil,
       status: :online,
     }
@@ -16,26 +16,26 @@ defmodule XUber.Passenger do
     do: {:stop, :shutdown, state}
 
   def handle_call({:request, coordinates}, _from, state) do
-    trip = nil # todo, request trip from Dispatcher
+    ride = nil # todo, request ride from Dispatcher
 
-    {:reply, {:ok, trip}, %{state | trip: trip, status: :requesting}}
+    {:reply, {:ok, ride}, %{state | ride: ride, status: :requesting}}
   end
 
   def handle_call(:cancel, _from, state=%{status: :requesting}) do
-    # todo send trip :cancel message
-    {:reply, {:ok, state.trip}, %{state | trip: nil, status: :online}}
+    # todo send ride :cancel message
+    {:reply, {:ok, state.ride}, %{state | ride: nil, status: :online}}
   end
 
-  def handle_call({:assign, trip, driver}, _from, state=%{status: :requesting}) do
-    {:reply, :ok, %{state | trip: trip, driver: driver, status: :waiting}}
+  def handle_call({:assign, ride, driver}, _from, state=%{status: :requesting}) do
+    {:reply, :ok, %{state | ride: ride, driver: driver, status: :waiting}}
   end
 
-  def handle_call(:depart, _from, state=%{status: :waiting, trip: trip}) when not is_nil(trip) do
+  def handle_call(:depart, _from, state=%{status: :waiting, ride: ride}) when not is_nil(ride) do
     {:reply, :ok, %{state | status: :riding}}
   end
 
-  def handle_call(:arrive, _from, state=%{status: :riding, trip: trip}) when not is_nil(trip) do
-    {:reply, :ok, %{state | trip: nil, driver: nil, status: :online}}
+  def handle_call(:arrive, _from, state=%{status: :riding, ride: ride}) when not is_nil(ride) do
+    {:reply, :ok, %{state | ride: nil, driver: nil, status: :online}}
   end
 
   def handle_call({:move, coordinates}, _from, state) do
@@ -53,8 +53,8 @@ defmodule XUber.Passenger do
   def cancel(pid),
     do: GenServer.call(pid, :cancel)
 
-  def assign(pid, trip, driver),
-    do: GenServer.call(:pid, {:assign, trip, driver})
+  def assign(pid, ride, driver),
+    do: GenServer.call(:pid, {:assign, ride, driver})
 
   def depart(pid),
     do: GenServer.call(pid, :depart)

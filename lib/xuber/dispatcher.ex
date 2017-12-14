@@ -1,7 +1,7 @@
 # TODO determine how to handle state here
 # the dispatcher should find the driver
 # and then wait for the driver to arrive
-# or maybe start the trip at the time the driver is found
+# or maybe start the ride at the time the driver is found
 # or is there an intermediate collaborator
 defmodule XUber.Dispatcher do
   use GenServer
@@ -29,10 +29,10 @@ defmodule XUber.Dispatcher do
       |> nearby_drivers
       |> List.first
 
-    trip = create_trip(driver, state.passenger)
+    ride = create_ride(driver, state.passenger)
 
-    Passenger.assign(state.passenger, trip, driver)
-    Driver.assign(driver, trip, state.passenger)
+    Passenger.assign(state.passenger, ride, driver)
+    Driver.assign(driver, ride, state.passenger)
 
     {:noreply, state}
   end
@@ -41,8 +41,8 @@ defmodule XUber.Dispatcher do
     [] # TODO contact TileSupervisor
   end
 
-  defp create_trip(driver, passenger) do
-    # TODO contact TripSuperisor
+  defp create_ride(driver, passenger) do
+    # TODO contact RideSuperisor
   end
 
   def cancel(pid),

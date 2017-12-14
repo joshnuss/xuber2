@@ -1,4 +1,4 @@
-defmodule XUber.Trip do
+defmodule XUber.Ride do
   use GenServer
 
   def start_link(_, passenger, driver) do
