@@ -9,6 +9,7 @@ defmodule XUber.Application do
     children = [
       {XUber.UserSupervisor, []},
       {XUber.DispatcherSupervisor, []},
+      {XUber.PickupSupervisor, []},
       {XUber.RideSupervisor, []},
     ]
 
