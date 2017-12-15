@@ -7,11 +7,11 @@ defmodule XUber.Application do
 
   def start(_type, _args) do
     children = [
-      {XUber.TileSupervisor, []},
-      {XUber.UserSupervisor, []},
-      {XUber.DispatcherSupervisor, []},
-      {XUber.PickupSupervisor, []},
-      {XUber.RideSupervisor, []},
+      XUber.TileSupervisor,
+      XUber.UserSupervisor,
+      XUber.DispatcherSupervisor,
+      XUber.PickupSupervisor,
+      XUber.RideSupervisor,
     ]
 
     opts = [strategy: :one_for_one, name: XUber.Supervisor]

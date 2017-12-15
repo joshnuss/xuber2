@@ -6,8 +6,8 @@ defmodule XUber.UserSupervisor do
 
   def init(:ok) do
     children = [
-      {XUber.Passenger, []},
-      {XUber.Driver, []}
+      XUber.Passenger,
+      XUber.Driver,
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
