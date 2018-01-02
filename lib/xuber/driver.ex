@@ -42,7 +42,7 @@ defmodule XUber.Driver do
   end
 
   def handle_call({:move, coordinates}, _from, state) do
-    Tile.move(self(), state.coordinates, coordinates)
+    Tile.update(self(), state.coordinates, coordinates)
 
     {:reply, :ok, %{state | coordinates: coordinates}}
   end

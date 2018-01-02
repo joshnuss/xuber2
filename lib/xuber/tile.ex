@@ -23,7 +23,7 @@ defmodule XUber.Tile do
     {:reply, :ok, %{state | data: Map.delete(state.data, user)}}
   end
 
-  def handle_call({:move, user, coordinates}, _from, state) do
+  def handle_call({:update, user, coordinates}, _from, state) do
     if outside?(state.jurisdiction, coordinates) do
       leave(user, coordinates)
       join(user, coordinates)
@@ -40,8 +40,8 @@ defmodule XUber.Tile do
   def leave(user, coordinates),
     do: call(coordinates, {:leave, user})
 
-  def move(user, last_position, new_position),
-    do: call(last_position, {:move, user, new_position})
+  def update(user, last_position, new_position),
+    do: call(last_position, {:update, user, new_position})
 
   def to_name({latitude, longitude}) do
     tile_latitude = to_integer(latitude/@tile_size)*@tile_size
