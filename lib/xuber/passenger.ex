@@ -13,7 +13,7 @@ defmodule XUber.Passenger do
   end
 
   def handle_call(:offline, _from, state),
-    do: {:stop, :shutdown, state}
+    do: {:stop, :normal, :ok, state}
 
   def handle_call({:request, coordinates}, _from, state) do
     ride = nil # todo, request ride from Dispatcher

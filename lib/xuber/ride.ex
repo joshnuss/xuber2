@@ -16,7 +16,7 @@ defmodule XUber.Ride do
 
   def handle_call(:complete, _from, state) do
     IO.puts "Finished ride: #{inspect state}"
-    {:stop, :normal, state}
+    {:stop, :normal, :ok, state}
   end
 
   def move(pid, coordinates),

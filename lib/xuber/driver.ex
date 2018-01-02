@@ -18,7 +18,7 @@ defmodule XUber.Driver do
     do: {:reply, :ok, %{state | status: :online}}
 
   def handle_call(:offline, _from, state=%{status: status}) when status == :available or status == :online,
-    do: {:stop, :shutdown, state}
+    do: {:stop, :normal, :ok, state}
 
   def handle_call({:assign, ride, passenger}, _from, state=%{status: :available}) do
     {:reply, :ok, %{state | ride: ride, passenger: passenger, status: :dispatched}}

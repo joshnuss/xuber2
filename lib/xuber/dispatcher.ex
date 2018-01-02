@@ -22,7 +22,7 @@ defmodule XUber.Dispatcher do
   end
 
   def handle_call(:cancel, _from, state),
-    do: {:stop, :shutdown, state}
+    do: {:stop, :normal, :ok, state}
 
   def handle_info(:request, state) do
     driver = state.coordinates

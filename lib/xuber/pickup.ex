@@ -15,11 +15,11 @@ defmodule XUber.Pickup do
     do: {:reply, :ok, %{state | points: [{Time.utc_now, coordinates}|points]}}
 
   def handle_call(:cancel, _from, state),
-    do: {:stop, :normal, state}
+    do: {:stop, :normal, :ok, state}
 
   def handle_call(:complete, _from, state) do
     IO.puts "Finished pickup: #{inspect state}"
-    {:stop, :normal, state}
+    {:stop, :normal, :ok, state}
   end
 
   def cancel(pid),
