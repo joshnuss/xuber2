@@ -1,14 +1,23 @@
 defmodule XUber.Driver do
   use GenServer
 
-  def start_link(user) do
+  alias XUber.Tile
+
+  def start_link([user, coordinates]) do
     state = %{
       user: user,
+      coordinates: coordinates,
       ride: nil,
       status: :online,
     }
 
     GenServer.start_link(__MODULE__, state, [])
+  end
+
+  def init(state) do
+    Tile.join(self(), state.coordinates)
+
+    {:ok, state}
   end
 
   def handle_call(:available, _from, state=%{status: status}) when status != :driving and status != :dispatched,
@@ -33,9 +42,9 @@ defmodule XUber.Driver do
   end
 
   def handle_call({:move, coordinates}, _from, state) do
-    # todo update tile managager
-    # leave tile if needed
-    {:reply, :ok, state}
+    Tile.move(self(), state.coordinates, coordinates)
+
+    {:reply, :ok, %{state | coordinates: coordinates}}
   end
 
   def offline(pid),
