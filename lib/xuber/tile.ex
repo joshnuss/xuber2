@@ -4,8 +4,6 @@ defmodule XUber.Tile do
   @tile_size Application.get_env(:xuber, :tile_size)
 
   def start_link(coordinates) do
-    IO.inspect coordinates
-
     name = to_name(coordinates)
     state = %{
       jurisdiction: coordinates,
@@ -13,6 +11,10 @@ defmodule XUber.Tile do
     }
 
     GenServer.start_link(__MODULE__, state, name: name)
+  end
+
+  def init(state) do
+    {:ok, state}
   end
 
   def handle_call({:join, pid, coordinates}, _from, state) do
