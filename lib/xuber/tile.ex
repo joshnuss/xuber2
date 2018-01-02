@@ -15,33 +15,33 @@ defmodule XUber.Tile do
     GenServer.start_link(__MODULE__, state, name: name)
   end
 
-  def handle_call({:join, user, coordinates}, _from, state) do
-    {:reply, :ok, put_in(state[:data][user], coordinates)}
+  def handle_call({:join, pid, coordinates}, _from, state) do
+    {:reply, :ok, put_in(state[:data][pid], coordinates)}
   end
 
-  def handle_call({:leave, user}, _from, state) do
-    {:reply, :ok, %{state | data: Map.delete(state.data, user)}}
+  def handle_call({:leave, pid}, _from, state) do
+    {:reply, :ok, %{state | data: Map.delete(state.data, pid)}}
   end
 
-  def handle_call({:update, user, coordinates}, _from, state) do
+  def handle_call({:update, pid, coordinates}, _from, state) do
     if outside?(state.jurisdiction, coordinates) do
-      leave(user, coordinates)
-      join(user, coordinates)
+      leave(pid, coordinates)
+      join(pid, coordinates)
 
       {:reply, :ok, state}
      else
-      {:reply, :ok, put_in(state[:data][user], coordinates)}
+      {:reply, :ok, put_in(state[:data][pid], coordinates)}
     end
   end
 
-  def join(user, coordinates),
-    do: call(coordinates, {:join, user, coordinates})
+  def join(pid, coordinates),
+    do: call(coordinates, {:join, pid, coordinates})
 
-  def leave(user, coordinates),
-    do: call(coordinates, {:leave, user})
+  def leave(pid, coordinates),
+    do: call(coordinates, {:leave, pid})
 
-  def update(user, last_position, new_position),
-    do: call(last_position, {:update, user, new_position})
+  def update(pid, last_position, new_position),
+    do: call(last_position, {:update, pid, new_position})
 
   def to_name({latitude, longitude}) do
     tile_latitude = to_integer(latitude/@tile_size)*@tile_size
