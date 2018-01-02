@@ -15,7 +15,7 @@ defmodule XUber.TileSupervisor do
 
       coordinates = {latitude, longitude}
 
-      id = XUber.Tile.name(coordinates)
+      id = XUber.Tile.to_name(coordinates)
       mfa = {XUber.Tile, :start_link, [coordinates]}
 
       %{id: id, start: mfa}
