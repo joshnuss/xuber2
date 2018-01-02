@@ -54,7 +54,7 @@ defmodule XUber.Passenger do
     do: GenServer.call(pid, :cancel)
 
   def assign(pid, ride, driver),
-    do: GenServer.call(:pid, {:assign, ride, driver})
+    do: GenServer.call(pid, {:assign, ride, driver})
 
   def depart(pid),
     do: GenServer.call(pid, :depart)
