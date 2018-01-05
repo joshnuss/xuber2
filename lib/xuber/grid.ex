@@ -35,6 +35,9 @@ defmodule XUber.Grid do
   def update(pid, last_position, new_position),
     do: call(last_position, {:update, pid, new_position})
 
+  def nearby(coordinates, radius, options \\ []),
+    do: call(coordinates, {:nearby, coordinates, radius, options})
+
   defp to_name({latitude, longitude}) do
     tile_latitude = div(latitude, @tile_size)
     tile_longitude = div(longitude, @tile_size)

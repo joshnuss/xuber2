@@ -39,6 +39,10 @@ defmodule XUber.Tile do
     end
   end
 
+  def handle_call({:nearby, coordinates, radius, options}, _from, state) do
+    {:reply, Map.keys(state.pids), state}
+  end
+
   def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
     {:noreply, remove(state, pid)}
   end
