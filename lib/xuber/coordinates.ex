@@ -1,7 +1,9 @@
 defmodule XUber.Coordinates do
-  defp outside?({lat1, lng1}, {lat2, lng2}, bounds) do
-    to_integer(lat2) > to_integer(lat1+bounds) ||
-    to_integer(lng2) > to_integer(lng1+bounds)
+  @tile_size Application.get_env(:xuber, :tile_size)
+
+  def outside?({lat1, lng1}, {lat2, lng2}) do
+    to_integer(lat2) > to_integer(lat1+@tile_size) ||
+    to_integer(lng2) > to_integer(lng1+@tile_size)
   end
 
   defp to_integer(n) when is_integer(n),
