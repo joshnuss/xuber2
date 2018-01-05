@@ -1,8 +1,8 @@
-defmodule XUber.TileSupervisor do
+defmodule XUber.Grid do
   use Supervisor
 
   def start_link(_),
-    do: Supervisor.start_link(__MODULE__, :ok, name: XUber.TileSupervisor)
+    do: Supervisor.start_link(__MODULE__, :ok, name: XUber.Grid)
 
   def init(:ok) do
     tile_size = Application.get_env(:xuber, :tile_size)

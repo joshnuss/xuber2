@@ -34,7 +34,7 @@ defmodule XUber.Dispatcher do
   end
 
   defp nearby_drivers(coordinates) do
-    [] # TODO contact TileSupervisor
+    [] # TODO contact Grid
   end
 
   defp create_pickup(driver, passenger) do

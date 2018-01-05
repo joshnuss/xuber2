@@ -7,7 +7,7 @@ defmodule XUber.Application do
 
   def start(_type, _args) do
     children = [
-      XUber.TileSupervisor,
+      XUber.Grid,
       XUber.UserSupervisor,
       XUber.DispatcherSupervisor,
       XUber.PickupSupervisor,
