@@ -1,7 +1,7 @@
 defmodule XUber.Driver do
   use GenServer
 
-  alias XUber.Tile
+  alias XUber.Grid
 
   def start_link([user, coordinates]) do
     state = %{
