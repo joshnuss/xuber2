@@ -1,10 +1,12 @@
 defmodule XUber.Tile do
   use GenServer
 
+  alias XUber.{Coordinates, Grid}
+
   def start_link(name, coordinates) do
     state = %{
       jurisdiction: coordinates,
-      data: %{},
+      pids: %{},
     }
 
     GenServer.start_link(__MODULE__, state, name: name)
@@ -15,21 +17,35 @@ defmodule XUber.Tile do
   end
 
   def handle_call({:join, pid, coordinates}, _from, state) do
-    {:reply, :ok, put_in(state[:data][pid], coordinates)}
+    record = %{
+      position: coordinates,
+      ref: Process.monitor(pid)
+    }
+
+    {:reply, :ok, put_in(state[:pids][pid], record)}
   end
 
   def handle_call({:leave, pid}, _from, state) do
-    {:reply, :ok, %{state | data: Map.delete(state.data, pid)}}
+    {:reply, :ok, remove(state, pid)}
   end
 
   def handle_call({:update, pid, coordinates}, _from, state) do
     if Coordinates.outside?(state.jurisdiction, coordinates) do
-      Grid.leave(pid, coordinates)
       Grid.join(pid, coordinates)
 
-      {:reply, :ok, state}
+      {:reply, :ok, remove(state, pid)}
      else
-      {:reply, :ok, put_in(state[:data][pid], coordinates)}
+      {:reply, :ok, put_in(state[:pids][pid][:position], coordinates)}
     end
+  end
+
+  def handle_info({:DOWN, _ref, :process, pid, _reason}, state) do
+    {:noreply, remove(state, pid)}
+  end
+
+  defp remove(state, pid) do
+    Process.demonitor(state.pids[pid].ref)
+
+    %{state | pids: Map.delete(state.pids, pid)}
   end
 end
