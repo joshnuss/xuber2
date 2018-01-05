@@ -26,7 +26,7 @@ defmodule XUber.Tile do
   end
 
   def handle_call({:update, pid, coordinates}, _from, state) do
-    if outside?(state.jurisdiction, coordinates) do
+    if Coordinates.outside?(state.jurisdiction, coordinates) do
       leave(pid, coordinates)
       join(pid, coordinates)
 
@@ -46,8 +46,8 @@ defmodule XUber.Tile do
     do: call(last_position, {:update, pid, new_position})
 
   def to_name({latitude, longitude}) do
-    tile_latitude = to_integer(latitude/@tile_size)*@tile_size
-    tile_longitude = to_integer(longitude/@tile_size)*@tile_size
+    tile_latitude = div(latitude, @tile_size)
+    tile_longitude = div(longitude, @tile_size)
 
     :"tile-#{tile_latitude}-#{tile_longitude}"
   end
@@ -57,14 +57,4 @@ defmodule XUber.Tile do
     |> to_name
     |> GenServer.call(arguments)
   end
-
-  defp outside?({lat1, lng1}, {lat2, lng2}) do
-    to_integer(lat2) > to_integer(lat1+@tile_size) ||
-    to_integer(lng2) > to_integer(lng1+@tile_size)
-  end
-
-  defp to_integer(n) when is_integer(n),
-    do: n
-  defp to_integer(float) when is_float(float),
-    do: float |> Float.floor |> round
 end
