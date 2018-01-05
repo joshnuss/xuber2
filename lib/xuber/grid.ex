@@ -7,16 +7,7 @@ defmodule XUber.Grid do
     do: Supervisor.start_link(__MODULE__, :ok, name: XUber.Grid)
 
   def init(:ok) do
-    tile_size = Application.get_env(:xuber, :tile_size)
-
-    children =
-      for latitude <- -90..90,
-          longitude <- -180..180,
-          rem(latitude, tile_size) == 0,
-          rem(longitude, tile_size) == 0 do
-
-      coordinates = {latitude, longitude}
-
+    children = Enum.map grid_coordinates(), fn coordinates ->
       id = to_name(coordinates)
       mfa = {XUber.Tile, :start_link, [id, coordinates]}
 
@@ -49,5 +40,14 @@ defmodule XUber.Grid do
     coordinates
     |> to_name
     |> GenServer.call(arguments)
+  end
+
+  defp grid_coordinates do
+    for latitude <- -90..90,
+        longitude <- -180..180,
+        rem(latitude, @tile_size) == 0,
+        rem(longitude, @tile_size) == 0 do
+      {latitude, longitude}
+    end
   end
 end
