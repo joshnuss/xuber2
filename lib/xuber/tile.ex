@@ -1,10 +1,7 @@
 defmodule XUber.Tile do
   use GenServer
 
-  @tile_size Application.get_env(:xuber, :tile_size)
-
-  def start_link(coordinates) do
-    name = to_name(coordinates)
+  def start_link(name, coordinates) do
     state = %{
       jurisdiction: coordinates,
       data: %{},
@@ -27,34 +24,12 @@ defmodule XUber.Tile do
 
   def handle_call({:update, pid, coordinates}, _from, state) do
     if Coordinates.outside?(state.jurisdiction, coordinates) do
-      leave(pid, coordinates)
-      join(pid, coordinates)
+      Grid.leave(pid, coordinates)
+      Grid.join(pid, coordinates)
 
       {:reply, :ok, state}
      else
       {:reply, :ok, put_in(state[:data][pid], coordinates)}
     end
-  end
-
-  def join(pid, coordinates),
-    do: call(coordinates, {:join, pid, coordinates})
-
-  def leave(pid, coordinates),
-    do: call(coordinates, {:leave, pid})
-
-  def update(pid, last_position, new_position),
-    do: call(last_position, {:update, pid, new_position})
-
-  def to_name({latitude, longitude}) do
-    tile_latitude = div(latitude, @tile_size)
-    tile_longitude = div(longitude, @tile_size)
-
-    :"tile-#{tile_latitude}-#{tile_longitude}"
-  end
-
-  defp call(coordinates, arguments) do
-    coordinates
-    |> to_name
-    |> GenServer.call(arguments)
   end
 end
