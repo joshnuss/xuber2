@@ -16,7 +16,7 @@ defmodule XUber.Passenger do
   end
 
   def init(state) do
-    Tile.join(self(), state.coordinates)
+    Grid.join(self(), state.coordinates)
 
     {:ok, state}
   end
