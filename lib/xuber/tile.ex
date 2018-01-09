@@ -39,11 +39,11 @@ defmodule XUber.Tile do
     end
   end
 
-  def handle_call({:nearby, {lat1, lng1}, radius, options}, _from, state) do
+  def handle_call({:nearby, from, radius, options}, _from, state) do
     results = state.pids
               |> Enum.into([])
-              |> Enum.filter(fn {pid, %{position: {lat2, lng2}}} ->
-                :math.sqrt(:math.pow(lat2 - lat1, 2) + :math.pow(lng2 - lng1, 2)) < radius
+              |> Enum.filter(fn {pid, %{position: to}} ->
+                Coordinates.distance(from, to) < radius
               end)
               |> Enum.map(fn {pid, _position} -> pid end)
 
