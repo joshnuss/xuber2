@@ -1,12 +1,17 @@
 defmodule XUber.Passenger do
   use GenServer
 
-  alias XUber.Grid
+  alias XUber.{
+    Grid,
+    DispatcherSupervisor
+  }
 
   def start_link([user, coordinates]) do
     state = %{
       user: user,
       coordinates: coordinates,
+      request: nil,
+      pickup: nil,
       ride: nil,
       driver: nil,
       status: :online,
@@ -25,9 +30,13 @@ defmodule XUber.Passenger do
     do: {:stop, :normal, :ok, state}
 
   def handle_call({:request, coordinates}, _from, state) do
-    ride = nil # todo, request ride from Dispatcher
+    {:ok, request} = DispatcherSupervisor.start_child(self(), coordinates)
 
-    {:reply, {:ok, ride}, %{state | ride: ride, status: :requesting}}
+    {:reply, {:ok, request}, %{state | request: request, status: :requesting}}
+  end
+
+  def handle_call({:dispatched, pickup, driver}, _from, state) do
+    {:reply, {:ok, pickup}, %{state | pickup: pickup, driver: driver, status: :enroute}}
   end
 
   def handle_call(:cancel, _from, state=%{status: :requesting}) do
@@ -64,6 +73,9 @@ defmodule XUber.Passenger do
 
   def assign(pid, ride, driver),
     do: GenServer.call(pid, {:assign, ride, driver})
+
+  def dispatched(pid, pickup, driver),
+    do: GenServer.call(pid, {:dispatched, pickup, driver})
 
   def depart(pid),
     do: GenServer.call(pid, :depart)

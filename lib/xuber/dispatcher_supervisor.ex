@@ -1,10 +1,18 @@
 defmodule XUber.DispatcherSupervisor do
-  use Supervisor
+  use DynamicSupervisor
+
+  alias XUber.Dispatcher
+
+  @name __MODULE__
 
   def start_link(_),
-    do: Supervisor.start_link(__MODULE__, :ok, name: XUber.DispatcherSupervisor)
+    do: DynamicSupervisor.start_link(__MODULE__, :ok, name: @name)
 
   def init(:ok) do
-    Supervisor.init([XUber.Dispatcher], strategy: :simple_one_for_one)
+    DynamicSupervisor.init(strategy: :one_for_one)
+  end
+
+  def start_child(passenger, coordinates) do
+    DynamicSupervisor.start_child(@name, {Dispatcher, [passenger, coordinates]})
   end
 end

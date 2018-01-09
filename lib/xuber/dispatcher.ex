@@ -1,7 +1,15 @@
 defmodule XUber.Dispatcher do
   use GenServer
 
-  def start_link(passenger, coordinates) do
+  alias XUber.{
+    Driver,
+    Passenger,
+    Grid
+  }
+
+  @search_radius 5
+
+  def start_link([passenger, coordinates]) do
     state = %{
       passenger: passenger,
       coordinates: coordinates,
@@ -19,22 +27,20 @@ defmodule XUber.Dispatcher do
   def handle_call(:cancel, _from, state),
     do: {:stop, :normal, :ok, state}
 
-  def handle_info(:request, state) do
-    driver = state.coordinates
-      |> nearby_drivers
+  def handle_info(:request, state = %{passenger: passenger}) do
+    {:ok, nearby} = Grid.nearby(state.coordinates, @search_radius)
+
+    driver = nearby
+      |> Enum.drop_while(&(&1 !== passenger))
       |> List.first
 
-    pickup = create_pickup(driver, state.passenger)
+    pickup = create_pickup(driver, passenger)
 
     # TODO: update #assign to handle `pickup` (instead of `ride`)
-    Passenger.assign(state.passenger, pickup, driver)
-    Driver.assign(driver, pickup, state.passenger)
+    Passenger.dispatched(passenger, pickup, driver)
+    Driver.dispatched(driver, pickup, passenger)
 
     {:noreply, state}
-  end
-
-  defp nearby_drivers(coordinates) do
-    [] # TODO contact Grid
   end
 
   defp create_pickup(driver, passenger) do
