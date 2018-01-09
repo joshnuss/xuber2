@@ -1,10 +1,11 @@
 defmodule XUber.Pickup do
   use GenServer
 
-  def start_link(_, passenger, driver) do
+  def start_link([passenger, driver, coordinates]) do
     state = %{
       passenger: passenger,
       driver: driver,
+      coordinates: coordinates,
       points: [],
     }
 

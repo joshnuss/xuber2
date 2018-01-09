@@ -2,6 +2,7 @@ defmodule XUber.Dispatcher do
   use GenServer
 
   alias XUber.{
+    PickupSupervisor,
     Driver,
     Passenger,
     Grid
@@ -27,24 +28,21 @@ defmodule XUber.Dispatcher do
   def handle_call(:cancel, _from, state),
     do: {:stop, :normal, :ok, state}
 
-  def handle_info(:request, state = %{passenger: passenger}) do
-    {:ok, nearby} = Grid.nearby(state.coordinates, @search_radius)
+  def handle_info(:request, state = %{coordinates: coordinates, passenger: passenger}) do
+    {:ok, nearest} = Grid.nearby(coordinates, @search_radius)
 
-    driver = nearby
+    driver = nearest
       |> Enum.drop_while(&(&1 !== passenger))
-      |> List.first
+      |> List.first # TODO: ensure it's a driver
 
-    pickup = create_pickup(driver, passenger)
+    IO.puts "got driver #{inspect driver}"
 
-    # TODO: update #assign to handle `pickup` (instead of `ride`)
+    {:ok, pickup} = PickupSupervisor.start_child(driver, passenger, coordinates)
+
     Passenger.dispatched(passenger, pickup, driver)
     Driver.dispatched(driver, pickup, passenger)
 
     {:noreply, state}
-  end
-
-  defp create_pickup(driver, passenger) do
-    # TODO contact PickupSuperisor
   end
 
   def cancel(pid),

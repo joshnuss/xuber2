@@ -1,10 +1,17 @@
 defmodule XUber.PickupSupervisor do
-  use Supervisor
+  use DynamicSupervisor
+
+  alias XUber.Pickup
+
+  @name __MODULE__
 
   def start_link(_),
-    do: Supervisor.start_link(__MODULE__, :ok, name: XUber.PickupSupervisor)
+    do: DynamicSupervisor.start_link(__MODULE__, :ok, name: @name)
 
-  def init(:ok) do
-    Supervisor.init([XUber.Pickup], strategy: :simple_one_for_one)
+  def init(:ok),
+    do: DynamicSupervisor.init(strategy: :one_for_one)
+
+  def start_child(driver, passenger, coordinates) do
+    DynamicSupervisor.start_child(@name, {Pickup, [driver, passenger, coordinates]})
   end
 end
