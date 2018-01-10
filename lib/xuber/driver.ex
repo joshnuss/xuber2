@@ -5,7 +5,8 @@ defmodule XUber.Driver do
     Grid,
     RideSupervisor,
     Passenger,
-    Pickup
+    Pickup,
+    Ride,
   }
 
   def start_link([user, coordinates]) do
@@ -48,7 +49,8 @@ defmodule XUber.Driver do
     {:reply, :ok, %{state | ride: ride, pickup: nil, status: :riding}}
   end
 
-  def handle_call(:dropoff, _from, state=%{status: :driving, ride: ride}) when not is_nil(ride) do
+  def handle_call(:dropoff, _from, state=%{status: :riding, ride: ride}) when not is_nil(ride) do
+    Ride.complete(ride)
     {:reply, :ok, %{state | ride: nil, passenger: nil, status: :available}}
   end
 

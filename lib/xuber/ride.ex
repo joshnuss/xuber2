@@ -1,6 +1,8 @@
 defmodule XUber.Ride do
   use GenServer, restart: :transient
 
+  alias XUber.Passenger
+
   def start_link([passenger, driver, coordinates]) do
     state = %{
       passenger: passenger,
@@ -15,7 +17,7 @@ defmodule XUber.Ride do
     do: {:reply, :ok, %{state | points: [{Time.utc_now, coordinates}|points]}}
 
   def handle_call(:complete, _from, state) do
-    IO.puts "Finished ride: #{inspect state}"
+    Passenger.arrive(state.passenger)
     {:stop, :normal, :ok, state}
   end
 
