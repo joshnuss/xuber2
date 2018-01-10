@@ -13,7 +13,7 @@ defmodule XUber.Pickup do
   end
 
   def handle_call({:move, coordinates}, _from, state=%{points: points}),
-    do: {:reply, :ok, %{state | points: [{Time.utc_now, coordinates}|points]}}
+    do: {:reply, :ok, %{state | points: [{DateTime.utc_now, coordinates}|points]}}
 
   def handle_call(:cancel, _from, state),
     do: {:stop, :normal, :ok, state}

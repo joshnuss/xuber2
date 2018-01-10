@@ -52,7 +52,7 @@ defmodule XUber.Passenger do
   end
 
   def handle_call({:move, coordinates}, _from, state) do
-    Tile.update(self(), state.coordinates, coordinates)
+    Grid.update(self(), state.coordinates, coordinates)
 
     {:reply, :ok, %{state | coordinates: coordinates}}
   end

@@ -55,7 +55,10 @@ defmodule XUber.Driver do
   end
 
   def handle_call({:move, coordinates}, _from, state) do
-    Tile.update(self(), state.coordinates, coordinates)
+    Grid.update(self(), state.coordinates, coordinates)
+
+    if state.pickup, do: Pickup.move(state.pickup, coordinates)
+    if state.ride, do: Ride.move(state.ride, coordinates)
 
     {:reply, :ok, %{state | coordinates: coordinates}}
   end
