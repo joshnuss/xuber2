@@ -1,7 +1,12 @@
 defmodule XUber.Driver do
-  use GenServer
+  use GenServer, restart: :transient
 
-  alias XUber.Grid
+  alias XUber.{
+    Grid,
+    RideSupervisor,
+    Passenger,
+    Pickup
+  }
 
   def start_link([user, coordinates]) do
     state = %{
@@ -31,12 +36,16 @@ defmodule XUber.Driver do
   def handle_call(:offline, _from, state=%{status: status}) when status == :available or status == :online,
     do: {:stop, :normal, :ok, state}
 
-  def handle_call({:dispatched, pickup, passenger}, _from, state=%{status: :available}) do
-    {:reply, :ok, %{state | pickup: pickup, passenger: passenger, status: :enroute}}
+  def handle_call({:dispatched, pickup, passenger}, _from, state) do
+    {:reply, :ok, %{state | pickup: pickup, passenger: passenger, status: :dispatched}}
   end
 
-  def handle_call({:pickup, ride}, _from, state=%{status: :dispatched, ride: ride}) when not is_nil(ride) do
-    {:reply, :ok, %{state | ride: ride, status: :driving}}
+  def handle_call(:arrived, _from, state=%{pickup: pickup, passenger: passenger, status: :dispatched}) when not is_nil(pickup) do
+    Pickup.complete(pickup)
+    {:ok, ride} = RideSupervisor.start_child(passenger, self())
+    Passenger.depart(passenger, ride)
+
+    {:reply, :ok, %{state | ride: ride, pickup: nil, status: :riding}}
   end
 
   def handle_call(:dropoff, _from, state=%{status: :driving, ride: ride}) when not is_nil(ride) do
@@ -58,11 +67,11 @@ defmodule XUber.Driver do
   def unavailable(pid),
     do: GenServer.call(pid, :unavailable)
 
-  def dispatched(pid, pickup, passenger),
+  def dispatch(pid, pickup, passenger),
     do: GenServer.call(pid, {:dispatched, pickup, passenger})
 
-  def pickup(pid, ride),
-    do: GenServer.call(pid, {:pickup, ride})
+  def arrive(pid),
+    do: GenServer.call(pid, :arrived)
 
   def dropoff(pid),
     do: GenServer.call(pid, :dropoff)

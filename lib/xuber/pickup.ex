@@ -1,5 +1,5 @@
 defmodule XUber.Pickup do
-  use GenServer
+  use GenServer, restart: :transient
 
   def start_link([passenger, driver, coordinates]) do
     state = %{
@@ -18,10 +18,8 @@ defmodule XUber.Pickup do
   def handle_call(:cancel, _from, state),
     do: {:stop, :normal, :ok, state}
 
-  def handle_call(:complete, _from, state) do
-    IO.puts "Finished pickup: #{inspect state}"
-    {:stop, :normal, :ok, state}
-  end
+  def handle_call(:complete, _from, state),
+    do: {:stop, :normal, :ok, state}
 
   def cancel(pid),
     do: GenServer.call(pid, :cancel)

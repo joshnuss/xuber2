@@ -1,7 +1,7 @@
 defmodule XUber.Ride do
-  use GenServer
+  use GenServer, restart: :transient
 
-  def start_link(_, passenger, driver) do
+  def start_link([passenger, driver]) do
     state = %{
       passenger: passenger,
       driver: driver,

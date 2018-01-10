@@ -32,15 +32,13 @@ defmodule XUber.Dispatcher do
     {:ok, nearest} = Grid.nearby(coordinates, @search_radius)
 
     driver = nearest
-      |> Enum.drop_while(&(&1 !== passenger))
+      |> Enum.filter(&(&1 !== passenger))
       |> List.first # TODO: ensure it's a driver
-
-    IO.puts "got driver #{inspect driver}"
 
     {:ok, pickup} = PickupSupervisor.start_child(driver, passenger, coordinates)
 
+    Driver.dispatch(driver, pickup, passenger)
     Passenger.dispatched(passenger, pickup, driver)
-    Driver.dispatched(driver, pickup, passenger)
 
     {:noreply, state}
   end

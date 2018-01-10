@@ -1,5 +1,5 @@
 defmodule XUber.Passenger do
-  use GenServer
+  use GenServer, restart: :transient
 
   alias XUber.{
     Grid,
@@ -36,20 +36,15 @@ defmodule XUber.Passenger do
   end
 
   def handle_call({:dispatched, pickup, driver}, _from, state) do
-    {:reply, {:ok, pickup}, %{state | pickup: pickup, driver: driver, status: :enroute}}
+    {:reply, {:ok, pickup}, %{state | pickup: pickup, driver: driver, request: nil, status: :waiting}}
   end
 
-  def handle_call(:cancel, _from, state=%{status: :requesting}) do
-    # todo send ride :cancel message
-    {:reply, {:ok, state.ride}, %{state | ride: nil, status: :online}}
+  def handle_call(:cancel, _from, state=%{status: :waiting, ride: ride}) when not is_nil(ride) do
+    {:reply, Ride.cancel(ride), %{state | ride: nil, status: :online}}
   end
 
-  def handle_call({:assign, ride, driver}, _from, state=%{status: :requesting}) do
-    {:reply, :ok, %{state | ride: ride, driver: driver, status: :waiting}}
-  end
-
-  def handle_call(:depart, _from, state=%{status: :waiting, ride: ride}) when not is_nil(ride) do
-    {:reply, :ok, %{state | status: :riding}}
+  def handle_call({:depart, ride}, _from, state=%{status: :waiting, pickup: pickup, driver: driver}) when not is_nil(driver) and not is_nil(pickup) do
+    {:reply, :ok, %{state | ride: ride, pickup: nil, status: :riding}}
   end
 
   def handle_call(:arrive, _from, state=%{status: :riding, ride: ride}) when not is_nil(ride) do
@@ -71,14 +66,11 @@ defmodule XUber.Passenger do
   def cancel(pid),
     do: GenServer.call(pid, :cancel)
 
-  def assign(pid, ride, driver),
-    do: GenServer.call(pid, {:assign, ride, driver})
-
   def dispatched(pid, pickup, driver),
     do: GenServer.call(pid, {:dispatched, pickup, driver})
 
-  def depart(pid),
-    do: GenServer.call(pid, :depart)
+  def depart(pid, ride),
+    do: GenServer.call(pid, {:depart, ride})
 
   def arrive(pid),
     do: GenServer.call(pid, :arrive)
