@@ -3,9 +3,11 @@ defmodule XUber.Tile do
 
   alias XUber.{Geometry, Grid}
 
-  def start_link(name, coordinates) do
+  @tile_size Application.get_env(:xuber, :tile_size)
+
+  def start_link(name, coordinates={lat, lng}) do
     state = %{
-      jurisdiction: coordinates,
+      jurisdiction: {coordinates, {lat + @tile_size, lng + @tile_size}},
       pids: %{},
     }
 

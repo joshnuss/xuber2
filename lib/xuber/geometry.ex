@@ -1,9 +1,12 @@
 defmodule XUber.Geometry do
-  @tile_size Application.get_env(:xuber, :tile_size)
+  def outside?(bounds, coordinates),
+    do: !inside?(bounds, coordinates)
 
-  def outside?({x1, y1}, {x2, y2}) do
-    to_integer(x2) > to_integer(x1+@tile_size) ||
-    to_integer(y2) > to_integer(y1+@tile_size)
+  def inside?({{x1, y1}, {x2, y2}}, {x, y}) do
+    to_integer(x) >= to_integer(x1)
+      && to_integer(x) < to_integer(x2)
+      && to_integer(y) >= to_integer(y1)
+      && to_integer(y) < to_integer(y2)
   end
 
   def distance({x1, y1}, {x2, y2}) do
