@@ -1,11 +1,11 @@
 defmodule XUber.Ride do
   use GenServer, restart: :transient
 
-  def start_link([passenger, driver]) do
+  def start_link([passenger, driver, coordinates]) do
     state = %{
       passenger: passenger,
       driver: driver,
-      points: [],
+      points: [coordinates],
     }
 
     GenServer.start_link(__MODULE__, state, [])

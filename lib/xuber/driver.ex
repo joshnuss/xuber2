@@ -42,7 +42,7 @@ defmodule XUber.Driver do
 
   def handle_call(:arrived, _from, state=%{pickup: pickup, passenger: passenger, status: :dispatched}) when not is_nil(pickup) do
     Pickup.complete(pickup)
-    {:ok, ride} = RideSupervisor.start_child(passenger, self())
+    {:ok, ride} = RideSupervisor.start_child(passenger, self(), state.coordinates)
     Passenger.depart(passenger, ride)
 
     {:reply, :ok, %{state | ride: ride, pickup: nil, status: :riding}}
