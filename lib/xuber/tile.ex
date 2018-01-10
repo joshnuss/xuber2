@@ -1,7 +1,7 @@
 defmodule XUber.Tile do
   use GenServer
 
-  alias XUber.{Coordinates, Grid}
+  alias XUber.{Geometry, Grid}
 
   def start_link(name, coordinates) do
     state = %{
@@ -30,7 +30,7 @@ defmodule XUber.Tile do
   end
 
   def handle_call({:update, pid, coordinates}, _from, state) do
-    if Coordinates.outside?(state.jurisdiction, coordinates) do
+    if Geometry.outside?(state.jurisdiction, coordinates) do
       Grid.join(pid, coordinates)
 
       {:reply, :ok, remove(state, pid)}
@@ -43,7 +43,7 @@ defmodule XUber.Tile do
     results = state.pids
               |> Enum.into([])
               |> Enum.filter(fn {pid, %{position: to}} ->
-                Coordinates.distance(from, to) < radius
+                Geometry.distance(from, to) < radius
               end)
               |> Enum.map(fn {pid, _position} -> pid end)
 

@@ -1,4 +1,4 @@
-defmodule XUber.Coordinates do
+defmodule XUber.Geometry do
   @tile_size Application.get_env(:xuber, :tile_size)
 
   def outside?({x1, y1}, {x2, y2}) do
