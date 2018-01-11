@@ -29,11 +29,13 @@ defmodule XUber.Grid do
   def nearby(coordinates, radius, options \\ []),
     do: call(coordinates, {:nearby, coordinates, radius, options})
 
-  defp to_name({latitude, longitude}) do
-    tile_latitude = div(latitude, @tile_size)
-    tile_longitude = div(longitude, @tile_size)
+  defp origin({latitude, longitude}),
+    do: {div(latitude, @tile_size), div(longitude, @tile_size)}
 
-    :"tile-#{tile_latitude}-#{tile_longitude}"
+  defp to_name(coordinates) do
+    {latitude, longitude} = origin(coordinates)
+
+    :"tile-#{latitude}-#{longitude}"
   end
 
   defp call(coordinates, arguments) do
