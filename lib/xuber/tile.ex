@@ -44,10 +44,8 @@ defmodule XUber.Tile do
   def handle_call({:nearby, from, radius, options}, _from, state) do
     results = state.pids
               |> Enum.into([])
-              |> Enum.filter(fn {pid, %{position: to}} ->
-                Geometry.distance(from, to) < radius
-              end)
-              |> Enum.map(fn {pid, _position} -> pid end)
+              |> Enum.map(fn {pid, %{position: to}} -> {pid, to, Geometry.distance(from, to)} end)
+              |> Enum.filter(fn {_pid, _position, distance} -> distance < radius end)
 
     {:reply, {:ok, results}, state}
   end

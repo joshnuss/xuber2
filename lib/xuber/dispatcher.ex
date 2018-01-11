@@ -31,8 +31,8 @@ defmodule XUber.Dispatcher do
   def handle_info(:request, state = %{coordinates: coordinates, passenger: passenger}) do
     {:ok, nearest} = Grid.nearby(coordinates, @search_radius)
 
-    driver = nearest
-      |> Enum.filter(&(&1 !== passenger))
+    {driver, position, distance} = nearest
+      |> Enum.filter(fn {pid, position, distance} -> pid !== passenger end)
       |> List.first # TODO: ensure it's a driver
 
     {:ok, pickup} = PickupSupervisor.start_child(driver, passenger, coordinates)
