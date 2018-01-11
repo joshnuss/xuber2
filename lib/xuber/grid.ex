@@ -26,8 +26,23 @@ defmodule XUber.Grid do
   def update(pid, last_position, new_position),
     do: call(last_position, {:update, pid, new_position})
 
-  def nearby(coordinates, radius, options \\ []),
-    do: call(coordinates, {:nearby, coordinates, radius, options})
+  def nearby(coordinates, radius, options \\ []) do
+    coordinates
+    |> surrounding(radius)
+    |> Enum.map(&call(&1, {:nearby, coordinates, radius, options}))
+    |> Enum.map(fn {:ok, response} -> response end)
+    |> List.flatten
+    |> Enum.sort(fn {_, _, a}, {_, _, b} -> a >= b end)
+  end
+
+  defp surrounding(coordinates, radius) do
+    cond do
+      radius < @tile_size ->
+        [coordinates]
+      true ->
+        [] # TODO: determine tiles inside radius
+    end
+  end
 
   defp origin({latitude, longitude}),
     do: {div(latitude, @tile_size), div(longitude, @tile_size)}

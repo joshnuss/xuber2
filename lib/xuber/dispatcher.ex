@@ -29,7 +29,7 @@ defmodule XUber.Dispatcher do
     do: {:stop, :normal, :ok, state}
 
   def handle_info(:request, state = %{coordinates: coordinates, passenger: passenger}) do
-    {:ok, nearest} = Grid.nearby(coordinates, @search_radius)
+    nearest = Grid.nearby(coordinates, @search_radius)
 
     {driver, position, distance} = nearest
       |> Enum.filter(fn {pid, position, distance} -> pid !== passenger end)
