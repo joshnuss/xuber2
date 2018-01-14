@@ -17,8 +17,8 @@ defmodule XUber.Grid do
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  def join(pid, coordinates),
-    do: call(coordinates, {:join, pid, coordinates})
+  def join(pid, coordinates, traits \\ []),
+    do: call(coordinates, {:join, pid, coordinates, traits})
 
   def leave(pid, coordinates),
     do: call(coordinates, {:leave, pid})

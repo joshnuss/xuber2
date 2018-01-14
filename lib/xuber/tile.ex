@@ -18,9 +18,10 @@ defmodule XUber.Tile do
     {:ok, state}
   end
 
-  def handle_call({:join, pid, coordinates}, _from, state) do
+  def handle_call({:join, pid, coordinates, traits}, _from, state) do
     record = %{
       position: coordinates,
+      traits: traits,
       ref: Process.monitor(pid)
     }
 
@@ -41,9 +42,10 @@ defmodule XUber.Tile do
     end
   end
 
-  def handle_call({:nearby, from, radius, options}, _from, state) do
+  def handle_call({:nearby, from, radius, filters}, _from, state) do
     results = state.pids
               |> Enum.into([])
+              |> Enum.filter(fn {_pid, %{traits: traits}} -> (filters -- traits) == [] end)
               |> Enum.map(fn {pid, %{position: to}} -> {pid, to, Geometry.distance(from, to)} end)
               |> Enum.filter(fn {_pid, _position, distance} -> distance < radius end)
 

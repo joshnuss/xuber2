@@ -23,7 +23,7 @@ defmodule XUber.Driver do
   end
 
   def init(state) do
-    Grid.join(self(), state.coordinates)
+    Grid.join(self(), state.coordinates, [:driver])
 
     {:ok, state}
   end

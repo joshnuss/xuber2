@@ -21,7 +21,7 @@ defmodule XUber.Passenger do
   end
 
   def init(state) do
-    Grid.join(self(), state.coordinates)
+    Grid.join(self(), state.coordinates, [:passenger])
 
     {:ok, state}
   end
