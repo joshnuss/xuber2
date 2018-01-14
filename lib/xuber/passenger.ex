@@ -3,6 +3,7 @@ defmodule XUber.Passenger do
 
   alias XUber.{
     Grid,
+    Pickup,
     DispatcherSupervisor
   }
 
@@ -39,8 +40,8 @@ defmodule XUber.Passenger do
     {:reply, {:ok, pickup}, %{state | pickup: pickup, driver: driver, request: nil, status: :waiting}}
   end
 
-  def handle_call(:cancel, _from, state=%{status: :waiting, ride: ride}) when not is_nil(ride) do
-    {:reply, Ride.cancel(ride), %{state | ride: nil, status: :online}}
+  def handle_call(:cancel, _from, state=%{status: :waiting, pickup: pickup}) when not is_nil(pickup) do
+    {:reply, Pickup.cancel(pickup), %{state | ride: nil, status: :online}}
   end
 
   def handle_call({:depart, ride}, _from, state=%{status: :waiting, pickup: pickup, driver: driver}) when not is_nil(driver) and not is_nil(pickup) do
