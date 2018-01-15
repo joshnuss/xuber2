@@ -8,6 +8,7 @@ defmodule XUber.Passenger do
   }
 
   @search_radius 5
+  @search_interval 1000
 
   def start_link([user, coordinates]) do
     state = %{
@@ -27,7 +28,7 @@ defmodule XUber.Passenger do
   def init(state) do
     Grid.join(self(), state.coordinates, [:passenger])
 
-    :timer.send_interval(1000, :nearby)
+    :timer.send_interval(@search_interval, :nearby)
 
     {:ok, state}
   end
