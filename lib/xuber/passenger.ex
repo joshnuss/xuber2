@@ -7,10 +7,13 @@ defmodule XUber.Passenger do
     DispatcherSupervisor
   }
 
+  @search_radius 5
+
   def start_link([user, coordinates]) do
     state = %{
       user: user,
       coordinates: coordinates,
+      nearby: [],
       request: nil,
       pickup: nil,
       ride: nil,
@@ -23,6 +26,8 @@ defmodule XUber.Passenger do
 
   def init(state) do
     Grid.join(self(), state.coordinates, [:passenger])
+
+    :timer.send_interval(1000, :nearby)
 
     {:ok, state}
   end
@@ -56,6 +61,12 @@ defmodule XUber.Passenger do
     Grid.update(self(), state.coordinates, coordinates)
 
     {:reply, :ok, %{state | coordinates: coordinates}}
+  end
+
+  def handle_info(:nearby, state) do
+    nearby = Grid.nearby(state.coordinates, @search_radius, [:driver])
+
+    {:noreply, %{state | nearby: nearby}}
   end
 
   def offline(pid),
