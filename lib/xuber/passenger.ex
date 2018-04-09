@@ -86,11 +86,6 @@ defmodule XUber.Passenger do
     {:keep_state, %{data | nearby: nearby}}
   end
 
-  def handle_event(a, b, c, d) do
-    IO.inspect [a,b,c,d]
-    {:keep_state, nil, []}
-  end
-
   def offline(pid),
     do: GenStateMachine.call(pid, :offline)
 
