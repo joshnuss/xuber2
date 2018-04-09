@@ -1,5 +1,5 @@
 defmodule XUber.Passenger do
-  use GenServer, restart: :transient
+  use GenStateMachine, restart: :transient
 
   alias XUber.{
     Grid,
@@ -11,83 +11,104 @@ defmodule XUber.Passenger do
   @search_interval 1000
 
   def start_link([user, coordinates]) do
-    state = %{
+    data = %{
       user: user,
       coordinates: coordinates,
       nearby: [],
       request: nil,
       pickup: nil,
       ride: nil,
-      driver: nil,
-      status: :online,
+      driver: nil
     }
 
-    GenServer.start_link(__MODULE__, state, [])
+    GenStateMachine.start_link(__MODULE__, data, [])
   end
 
-  def init(state) do
-    Grid.join(self(), state.coordinates, [:passenger])
+  def init(data) do
+    Grid.join(self(), data.coordinates, [:passenger])
 
     :timer.send_interval(@search_interval, :nearby)
 
-    {:ok, state}
+    {:ok, :online, data}
   end
 
   def handle_call(:offline, _from, state),
     do: {:stop, :normal, :ok, state}
 
-  def handle_call({:request, coordinates}, _from, state) do
+  def handle_event({:call, from}, {:request, coordinates}, :online, data) do
     {:ok, request} = DispatcherSupervisor.start_child(self(), coordinates)
+    reply = {:reply, from, {:ok, request}}
+    new_data = %{data | request: request}
 
-    {:reply, {:ok, request}, %{state | request: request, status: :requesting}}
+    {:next_state, :requesting, new_data, reply}
   end
 
-  def handle_call({:dispatched, pickup, driver}, _from, state) do
-    {:reply, {:ok, pickup}, %{state | pickup: pickup, driver: driver, request: nil, status: :waiting}}
+  def handle_event({:call, from}, {:dispatched, pickup, driver}, :requesting, data) do
+    reply = {:reply, from, {:ok, pickup}}
+    new_data = %{data | pickup: pickup, driver: driver, request: nil}
+
+    {:next_state, :waiting, new_data, reply}
   end
 
-  def handle_call(:cancel, _from, state=%{status: :waiting, pickup: pickup}) when not is_nil(pickup) do
-    {:reply, Pickup.cancel(pickup), %{state | ride: nil, status: :online}}
+  def handle_event({:call, from}, :cancel, :waiting, data) do
+    reply = {:reply, from, Pickup.cancel(data.pickup)}
+    new_data = %{data | pickup: nil}
+
+    {:next_state, :online, new_data, reply}
   end
 
-  def handle_call({:depart, ride}, _from, state=%{status: :waiting, pickup: pickup, driver: driver}) when not is_nil(driver) and not is_nil(pickup) do
-    {:reply, :ok, %{state | ride: ride, pickup: nil, status: :riding}}
+  def handle_event({:call, from}, {:depart, ride}, :waiting, data=%{pickup: pickup, driver: driver}) when not is_nil(driver) and not is_nil(pickup) do
+    reply = {:reply, from, :ok}
+    new_data = %{data | ride: ride, pickup: nil}
+
+    {:next_state, :riding, new_data, reply}
   end
 
-  def handle_call(:arrive, _from, state=%{status: :riding, ride: ride}) when not is_nil(ride) do
-    {:reply, :ok, %{state | ride: nil, driver: nil, status: :online}}
+  def handle_event({:call, from}, :arrive, :riding, data=%{ride: ride}) when not is_nil(ride) do
+    reply = {:reply, from, :ok}
+    new_data = %{data | ride: nil, driver: nil}
+
+    {:next_state, :online, new_data, reply}
   end
 
-  def handle_call({:move, coordinates}, _from, state) do
-    Grid.update(self(), state.coordinates, coordinates)
+  def handle_event({:call, from}, {:move, coordinates}, _state, data) do
+    Grid.update(self(), data.coordinates, coordinates)
 
-    {:reply, :ok, %{state | coordinates: coordinates}}
+    reply = {:reply, from, :ok}
+    new_data = %{data | coordinates: coordinates}
+
+    {:keep_state, new_data, reply}
   end
 
-  def handle_info(:nearby, state) do
-    nearby = Grid.nearby(state.coordinates, @search_radius, [:driver])
+  def handle_event(:info, :nearby, _state, data) do
+    nearby = Grid.nearby(data.coordinates, @search_radius, [:driver])
 
-    {:noreply, %{state | nearby: nearby}}
+    {:keep_state, %{data | nearby: nearby}}
+  end
+
+  def handle_event(a, b, c, d) do
+    IO.inspect [a,b,c,d]
+    {:keep_state, nil, []}
   end
 
   def offline(pid),
-    do: GenServer.call(pid, :offline)
+    do: GenStateMachine.call(pid, :offline)
 
   def request(pid, coordinates),
-    do: GenServer.call(pid, {:request, coordinates})
+    do: GenStateMachine.call(pid, {:request, coordinates})
 
   def cancel(pid),
-    do: GenServer.call(pid, :cancel)
+    do: GenStateMachine.call(pid, :cancel)
 
   def dispatched(pid, pickup, driver),
-    do: GenServer.call(pid, {:dispatched, pickup, driver})
+    do: GenStateMachine.call(pid, {:dispatched, pickup, driver})
 
   def depart(pid, ride),
-    do: GenServer.call(pid, {:depart, ride})
+    do: GenStateMachine.call(pid, {:depart, ride})
 
   def arrive(pid),
-    do: GenServer.call(pid, :arrive)
+    do: GenStateMachine.call(pid, :arrive)
 
   def move(pid, coordinates),
-    do: GenServer.call(pid, {:move, coordinates})
+    do: GenStateMachine.call(pid, {:move, coordinates})
 end
