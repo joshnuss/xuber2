@@ -33,8 +33,11 @@ defmodule XUber.Passenger do
     {:ok, :online, data}
   end
 
-  def handle_call(:offline, _from, state),
-    do: {:stop, :normal, :ok, state}
+  def handle_event({:call, from}, :offline, :online, data) do
+    reply = {:reply, from, :ok}
+
+    {:stop_and_reply, :normal, [reply], data}
+  end
 
   def handle_event({:call, from}, {:request, coordinates}, :online, data) do
     {:ok, request} = DispatcherSupervisor.start_child(self(), coordinates)
