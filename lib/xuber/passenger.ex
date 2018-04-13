@@ -36,7 +36,7 @@ defmodule XUber.Passenger do
   def handle_event({:call, from}, :offline, :online, data) do
     reply = {:reply, from, :ok}
 
-    {:stop_and_reply, :normal, [reply], data}
+    {:stop_and_reply, :normal, reply, data}
   end
 
   def handle_event({:call, from}, {:request, coordinates}, :online, data) do

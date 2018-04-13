@@ -43,7 +43,7 @@ defmodule XUber.Driver do
   def handle_event({:call, from}, :offline, status, data) when status == :available or status == :online do
     reply = {:reply, from, :ok}
 
-    {:stop_and_reply, :normal, [reply], data}
+    {:stop_and_reply, :normal, reply, data}
   end
 
   def handle_event({:call, from}, {:dispatch, pickup, passenger}, :online, data) do
