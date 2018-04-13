@@ -20,8 +20,9 @@ defmodule XUber.Passenger do
       ride: nil,
       driver: nil
     }
+    name = String.to_atom(user.name)
 
-    GenStateMachine.start_link(__MODULE__, data, [])
+    GenStateMachine.start_link(__MODULE__, data, name: name)
   end
 
   def init(data) do
