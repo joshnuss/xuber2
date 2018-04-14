@@ -102,6 +102,7 @@ defmodule XUber.Passenger do
   def handle_event(:info, :nearby, :online, data) do
     PubSub.publish(:passenger, {data.user, :nearby_search, data.coordinates, @search_radius})
 
+    # todo: ensure their are only available drivers
     nearby = Grid.nearby(data.coordinates, @search_radius, [:driver])
 
     PubSub.publish(:passenger, {data.user, :nearby_results, nearby})

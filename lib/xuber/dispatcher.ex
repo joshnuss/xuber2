@@ -33,7 +33,7 @@ defmodule XUber.Dispatcher do
 
     {driver, position, distance} = nearest
       |> Enum.filter(fn {pid, position, distance} -> pid !== passenger end)
-      |> List.first # TODO: ensure it's a driver
+      |> List.first # TODO: ensure it's an available driver
 
     {:ok, pickup} = PickupSupervisor.start_child(driver, passenger, coordinates)
 
