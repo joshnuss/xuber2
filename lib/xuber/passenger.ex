@@ -26,6 +26,8 @@ defmodule XUber.Passenger do
   end
 
   def init(data) do
+    PubSub.publish(:passenger, {data.user, :init, data.coordinates})
+
     Grid.join(self(), data.coordinates, [:passenger])
 
     :timer.send_interval(@search_interval, :nearby)
@@ -36,10 +38,14 @@ defmodule XUber.Passenger do
   def handle_event({:call, from}, :offline, :online, data) do
     reply = {:reply, from, :ok}
 
+    PubSub.publish(:passenger, {data.user, :offline})
+
     {:stop_and_reply, :normal, reply, data}
   end
 
   def handle_event({:call, from}, {:request, coordinates}, :online, data) do
+    PubSub.publish(:passenger, {data.user, :online})
+
     {:ok, request} = DispatcherSupervisor.start_child(self(), coordinates)
     reply = {:reply, from, {:ok, request}}
     new_data = %{data | request: request}
@@ -48,6 +54,8 @@ defmodule XUber.Passenger do
   end
 
   def handle_event({:call, from}, {:dispatched, pickup, driver}, :requesting, data) do
+    PubSub.publish(:passenger, {data.user, :dispatched, pickup, driver})
+
     reply = {:reply, from, {:ok, pickup}}
     new_data = %{data | pickup: pickup, driver: driver, request: nil}
 
@@ -55,6 +63,8 @@ defmodule XUber.Passenger do
   end
 
   def handle_event({:call, from}, :cancel, :waiting, data) do
+    PubSub.publish(:passenger, {data.user, :cancel, data.pickup})
+
     reply = {:reply, from, Pickup.cancel(data.pickup)}
     new_data = %{data | pickup: nil}
 
@@ -62,6 +72,8 @@ defmodule XUber.Passenger do
   end
 
   def handle_event({:call, from}, {:depart, ride}, :waiting, data=%{pickup: pickup, driver: driver}) when not is_nil(driver) and not is_nil(pickup) do
+    PubSub.publish(:passenger, {data.user, :depart, ride})
+
     reply = {:reply, from, :ok}
     new_data = %{data | ride: ride, pickup: nil}
 
@@ -69,6 +81,8 @@ defmodule XUber.Passenger do
   end
 
   def handle_event({:call, from}, :arrive, :riding, data=%{ride: ride}) when not is_nil(ride) do
+    PubSub.publish(:passenger, {data.user, :arrive, data.coordinates})
+
     reply = {:reply, from, :ok}
     new_data = %{data | ride: nil, driver: nil}
 
@@ -76,6 +90,7 @@ defmodule XUber.Passenger do
   end
 
   def handle_event({:call, from}, {:move, coordinates}, _state, data) do
+    PubSub.publish(:passenger, {data.user, :move, coordinates})
     Grid.update(self(), data.coordinates, coordinates)
 
     reply = {:reply, from, :ok}
@@ -85,7 +100,11 @@ defmodule XUber.Passenger do
   end
 
   def handle_event(:info, :nearby, _state, data) do
+    PubSub.publish(:passenger, {data.user, :nearby_search, data.coordinates, @search_radius})
+
     nearby = Grid.nearby(data.coordinates, @search_radius, [:driver])
+
+    PubSub.publish(:passenger, {data.user, :nearby_results, nearby})
 
     {:keep_state, %{data | nearby: nearby}}
   end
