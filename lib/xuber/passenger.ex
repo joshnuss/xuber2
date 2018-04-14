@@ -44,7 +44,7 @@ defmodule XUber.Passenger do
   end
 
   def handle_event({:call, from}, {:request, coordinates}, :online, data) do
-    PubSub.publish(:passenger, {data.user, :online})
+    PubSub.publish(:passenger, {data.user, :request, coordinates})
 
     {:ok, request} = DispatcherSupervisor.start_child(self(), coordinates)
     reply = {:reply, from, {:ok, request}}
