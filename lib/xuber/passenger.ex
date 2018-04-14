@@ -99,7 +99,7 @@ defmodule XUber.Passenger do
     {:keep_state, new_data, reply}
   end
 
-  def handle_event(:info, :nearby, _state, data) do
+  def handle_event(:info, :nearby, :online, data) do
     PubSub.publish(:passenger, {data.user, :nearby_search, data.coordinates, @search_radius})
 
     nearby = Grid.nearby(data.coordinates, @search_radius, [:driver])
@@ -107,6 +107,10 @@ defmodule XUber.Passenger do
     PubSub.publish(:passenger, {data.user, :nearby_results, nearby})
 
     {:keep_state, %{data | nearby: nearby}}
+  end
+
+  def handle_event(:info, :nearby, _other, data) do
+    {:keep_state, data}
   end
 
   def offline(pid),
