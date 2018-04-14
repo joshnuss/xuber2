@@ -26,7 +26,7 @@ hub clone joshnuss/xuber2
 mix run --no-halt examples/basic.exs
 ```
 
-## Example log data
+## Actual log data
 
 ```
 Passenger `mary` has joined at coordinates {10, 10}
