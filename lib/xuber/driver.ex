@@ -25,28 +25,35 @@ defmodule XUber.Driver do
   def init(data) do
     Grid.join(self(), data.coordinates, [:driver])
 
+    PubSub.publish(:driver, {data.user, :init, data.coordinates})
+
     {:ok, :online, data}
   end
 
   def handle_event({:call, from}, :available, :online, data) do
+    PubSub.publish(:driver, {data.user, :available})
     reply = {:reply, from, :ok}
 
     {:next_state, :available, data, reply}
   end
 
   def handle_event({:call, from}, :unavailable, :available, data) do
+    PubSub.publish(:driver, {data.user, :unavailable})
     reply = {:reply, from, :ok}
 
     {:next_state, :online, data, reply}
   end
 
   def handle_event({:call, from}, :offline, status, data) when status == :available or status == :online do
+    PubSub.publish(:driver, {data.user, :offline})
     reply = {:reply, from, :ok}
 
     {:stop_and_reply, :normal, reply, data}
   end
 
-  def handle_event({:call, from}, {:dispatch, pickup, passenger}, :online, data) do
+  def handle_event({:call, from}, {:dispatch, pickup, passenger}, :available, data) do
+    PubSub.publish(:driver, {data.user, :dispatch, pickup, passenger})
+
     reply = {:reply, from, :ok}
     new_data = %{data | pickup: pickup, passenger: passenger}
 
@@ -54,9 +61,13 @@ defmodule XUber.Driver do
   end
 
   def handle_event({:call, from}, :arrived, :dispatched, data) do
+    PubSub.publish(:driver, {data.user, :arrived, data.coordinates})
+
     :ok = Pickup.complete(data.pickup)
     {:ok, ride} = RideSupervisor.start_child(data.passenger, self(), data.coordinates)
     Passenger.depart(data.passenger, ride)
+
+    PubSub.publish(:driver, {data.user, :departed, ride})
 
     reply = {:reply, from, {:ok, ride}}
     new_data = %{data | ride: ride, pickup: nil}
@@ -65,6 +76,8 @@ defmodule XUber.Driver do
   end
 
   def handle_event({:call, from}, :dropoff, :riding, data=%{ride: ride}) when not is_nil(ride) do
+    PubSub.publish(:driver, {data.user, :dropoff, data.passenger, data.coordinates})
+
     :ok = Ride.complete(ride)
 
     reply = {:reply, from, {:ok, ride}}
@@ -74,6 +87,8 @@ defmodule XUber.Driver do
   end
 
   def handle_event({:call, from}, {:move, coordinates}, _any, data) do
+    PubSub.publish(:driver, {data.user, :move, coordinates})
+
     Grid.update(self(), data.coordinates, coordinates)
 
     if data.pickup, do: Pickup.move(data.pickup, coordinates)
