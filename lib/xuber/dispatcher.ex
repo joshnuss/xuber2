@@ -29,11 +29,15 @@ defmodule XUber.Dispatcher do
     do: {:stop, :normal, :ok, state}
 
   def handle_info(:request, state = %{coordinates: coordinates, passenger: passenger}) do
+    PubSub.publish(:dispatcher, {:request, coordinates, passenger})
+
     nearest = Grid.nearby(coordinates, @search_radius)
 
     {driver, position, distance} = nearest
       |> Enum.filter(fn {pid, position, distance} -> pid !== passenger end)
       |> List.first # TODO: ensure it's an available driver
+
+    PubSub.publish(:dispatcher, {:assigned, driver, passenger})
 
     {:ok, pickup} = PickupSupervisor.start_child(driver, passenger, coordinates)
 
