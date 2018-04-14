@@ -33,37 +33,38 @@ Passenger `mary` has joined at coordinates {10, 10}
 Driver `tom` has joined at coordinates {10, 10}
 Driver `tom` has indicated they are available
 Passenger `mary` is searching for drivers within 5km of coordinates {10, 10}
-Passenger `mary` found drivers: [{#PID<0.874.0>, {10, 10}, 0.0}]
+Passenger `mary` found drivers: `tom` @distance=0.0km
 Passenger `mary` is searching for drivers within 5km of coordinates {10, 10}
-Passenger `mary` found drivers: [{#PID<0.874.0>, {10, 10}, 0.0}]
+Passenger `mary` found drivers: `tom` @distance=0.0km
 Passenger `mary` is searching for drivers within 5km of coordinates {10, 10}
-Passenger `mary` found drivers: [{#PID<0.874.0>, {10, 10}, 0.0}]
+Passenger `mary` found drivers: `tom` @distance=0.0km
 Passenger `mary` has requested a pickup at coordinates {10, 10}
-Dispatcher received request for pickup at {10, 10} for #PID<0.872.0>
-Dispatcher assigned driver #PID<0.874.0> to pickup #PID<0.872.0>
-Driver `tom` has been notified to pickup passenger #PID<0.872.0>, pickup #PID<0.876.0>
-Passenger `mary` has been notified that driver #PID<0.874.0> will pick them up, pickup #PID<0.876.0>
+Dispatcher received request for pickup at {10, 10} for `mary`
+Dispatcher assigned driver `tom` to pickup `mary`
+Driver `tom` has been notified to pickup passenger `mary`, pickup #PID<0.878.0>
+Passenger `mary` has been notified that driver `tom` will pick them up, pickup #PID<0.878.0>
 Driver `tom` has moved to coordinates {10, 15}
 Driver `tom` has moved to coordinates {10, 16}
 Driver `tom` has arrived at destination {10, 16}
-Passenger `mary` has been picked up and is departing with ride #PID<0.877.0>
-Driver `tom` has departed, ride #PID<0.877.0>
+Ride #PID<0.879.0> has started for passenger `mary` and driver `tom`
+Driver `tom` has departed, ride #PID<0.879.0>
+Passenger `mary` has been picked up and is departing with ride #PID<0.879.0>
+Ride #PID<0.879.0> is at {10, 16}
 Driver `tom` has moved to coordinates {10, 16}
-Ride #PID<0.877.0> is at {10, 16}
+Ride #PID<0.879.0> is at {10, 16}
 Passenger `mary` has moved to coordinates {10, 16}
-Ride #PID<0.877.0> is at {10, 16}
 Driver `tom` has moved to coordinates {10, 17}
-Ride #PID<0.877.0> is at {10, 17}
+Ride #PID<0.879.0> is at {10, 17}
 Passenger `mary` has moved to coordinates {10, 17}
+Ride #PID<0.879.0> is at {10, 17}
+Ride #PID<0.879.0> is at {10, 18}
 Driver `tom` has moved to coordinates {10, 18}
-Ride #PID<0.877.0> is at {10, 17}
 Passenger `mary` has moved to coordinates {10, 18}
-Ride #PID<0.877.0> is at {10, 18}
+Ride #PID<0.879.0> is at {10, 18}
 Passenger `mary` has arrived at destination {10, 18}
-Ride #PID<0.877.0> is at {10, 18}
-Driver `tom` has dropped off passenger #PID<0.872.0> at coordinates {10, 18}
-Ride #PID<0.877.0> has been completed. Dropoff location was {10, 18}
+Driver `tom` has dropped off passenger `mary` at coordinates {10, 18}
+Ride #PID<0.879.0> has been completed. Dropoff location was {10, 18}
+Passenger `mary` has gone offline
 Driver `tom` has indicated they are unavailable
 Driver `tom` has gone offline
-Passenger `mary` has gone offline
 ```
