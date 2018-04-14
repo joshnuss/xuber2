@@ -16,13 +16,12 @@ Ride sharing apps are uniquely suited to Elixir/Erlang because the are:
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `xuber` to your list of dependencies in `mix.exs`:
+```bash
+hub clone joshnuss/xuber2
+```
 
-```elixir
-def deps do
-  [
-    {:xuber, "~> 0.1.0"}
-  ]
-end
+## Running examples
+
+```
+mix run --no-halt examples/basic.exs
 ```
