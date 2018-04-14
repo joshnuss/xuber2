@@ -2,8 +2,18 @@
 
 alias XUber.{User, Driver, Passenger, Ride, UserSupervisor}
 
+defmodule ProcessName do
+  def find_name(pid) do
+    info = Process.info(pid)
+
+    Keyword.get(info, :registered_name, pid)
+  end
+end
+
 defmodule Dispatcher.EventLogger do
   use GenServer
+
+  import ProcessName
 
   def init(state) do
     {:ok, state}
@@ -16,11 +26,11 @@ defmodule Dispatcher.EventLogger do
   end
 
   defp message({:request, coordinates, passenger}) do
-    "Dispatcher received request for pickup at #{inspect coordinates} for #{inspect passenger}"
+    "Dispatcher received request for pickup at #{inspect coordinates} for `#{find_name passenger}`"
   end
 
   defp message({:assigned, driver, passenger}) do
-    "Dispatcher assigned driver #{inspect driver} to pickup #{inspect passenger}"
+    "Dispatcher assigned driver `#{find_name driver}` to pickup `#{find_name passenger}`"
   end
 
   defp message(event) do
@@ -31,6 +41,8 @@ end
 defmodule Ride.EventLogger do
   use GenServer
 
+  import ProcessName
+
   def init(state) do
     {:ok, state}
   end
@@ -39,6 +51,10 @@ defmodule Ride.EventLogger do
     IO.puts message(event)
 
     {:noreply, state}
+  end
+
+  defp message({ride, :init, passenger, driver}) do
+    "Ride #{inspect ride} has started for passenger `#{find_name(passenger)}` and driver `#{find_name(driver)}`"
   end
 
   defp message({ride, :move, coordinates}) do
@@ -56,6 +72,8 @@ end
 
 defmodule Driver.EventLogger do
   use GenServer
+
+  import ProcessName
 
   def init(state) do
     {:ok, state}
@@ -80,7 +98,7 @@ defmodule Driver.EventLogger do
   end
 
   defp message({driver, :dispatch, pickup, passenger}) do
-    "Driver `#{driver.name}` has been notified to pickup passenger #{inspect passenger}, pickup #{inspect pickup}"
+    "Driver `#{driver.name}` has been notified to pickup passenger `#{find_name passenger}`, pickup #{inspect pickup}"
   end
 
   defp message({driver, :departed, ride}) do
@@ -92,7 +110,7 @@ defmodule Driver.EventLogger do
   end
 
   defp message({driver, :dropoff, passenger, coordinates}) do
-    "Driver `#{driver.name}` has dropped off passenger #{inspect passenger} at coordinates #{inspect coordinates}"
+    "Driver `#{driver.name}` has dropped off passenger `#{find_name passenger}` at coordinates #{inspect coordinates}"
   end
 
   defp message({driver, :offline}) do
@@ -110,6 +128,8 @@ end
 
 defmodule Passenger.EventLogger do
   use GenServer
+
+  import ProcessName
 
   def init(state) do
     {:ok, state}
@@ -130,7 +150,11 @@ defmodule Passenger.EventLogger do
   end
 
   defp message({passenger, :nearby_results, results}) do
-    "Passenger `#{passenger.name}` found drivers: #{inspect results}"
+    text = Enum.map_join results, ", ", fn
+      {driver, _coordinates, distance} -> "`#{find_name driver}` @distance=#{distance}km"
+    end
+
+    "Passenger `#{passenger.name}` found drivers: #{text}"
   end
 
   defp message({passenger, :request, coordinates}) do
@@ -142,7 +166,7 @@ defmodule Passenger.EventLogger do
   end
 
   defp message({passenger, :dispatched, pickup, driver}) do
-    "Passenger `#{passenger.name}` has been notified that driver #{inspect driver} will pick them up, pickup #{inspect pickup}"
+    "Passenger `#{passenger.name}` has been notified that driver `#{find_name driver}` will pick them up, pickup #{inspect pickup}"
   end
 
   defp message({passenger, :depart, ride}) do

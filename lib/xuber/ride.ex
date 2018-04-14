@@ -13,6 +13,11 @@ defmodule XUber.Ride do
     GenServer.start_link(__MODULE__, state, [])
   end
 
+  def init(state) do
+    PubSub.publish(:ride, {self(), :init, state.passenger, state.driver})
+    {:ok, state}
+  end
+
   def handle_call({:move, coordinates}, _from, state=%{points: points}) do
     PubSub.publish(:ride, {self(), :move, coordinates})
 
