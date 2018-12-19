@@ -23,10 +23,10 @@ defmodule XUber.Mixfile do
   defp deps do
     [
       {:pubsub, "~> 1.0"},
-      #{:gen_state_machine, "~> 2.0"}
-      {:gen_state_machine, git: "https://github.com/joshnuss/gen_state_machine", branch: "add-child-spec"}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      #{:gen_state_machine, "~> 2.0.4"}
+      {:gen_state_machine, git: "https://github.com/joshnuss/gen_state_machine", branch: "add-child-spec"},
+      {:ecto_sql, "~> 3.0"},
+      {:postgrex, ">= 0.0.0"}
     ]
   end
 end

@@ -31,3 +31,12 @@ config :xuber,
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+
+config :xuber, ecto_repos: [XUber.Repo]
+
+config :xuber, XUber.Repo,
+  database: "xuber",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  port: "5432"
