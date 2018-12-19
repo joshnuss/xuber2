@@ -8,6 +8,7 @@ defmodule XUber.Application do
   def start(_type, _args) do
     children = [
       %{id: PubSub, start: {PubSub, :start_link, []}},
+      XUber.DB,
       XUber.Grid,
       XUber.UserSupervisor,
       XUber.DispatcherSupervisor,
