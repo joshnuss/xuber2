@@ -40,14 +40,12 @@ defmodule XUber.Repo.Migrations.Setup do
     end
 
     create table(:logs) do
-      add(:reference_id, :int, null: false)
-      add(:type, :string, null: false)
+      add(:pickup_id, references(:pickups))
+      add(:ride_id, references(:rides))
       add(:latitude, :float, null: false)
       add(:longitude, :float, null: false)
 
       timestamps()
     end
-
-    create index(:logs, [:reference_id, :type])
   end
 end
