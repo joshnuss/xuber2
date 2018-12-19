@@ -1,10 +1,14 @@
 defmodule XUber.DB.Ride do
   use Ecto.Schema
 
-  alias XUber.DB.Pickup
+  alias XUber.DB.{
+    Log,
+    Pickup
+  }
 
   schema "rides" do
     belongs_to(:pickup, Pickup)
+    has_many(:logs, Log)
 
     field(:driver, :string)
     field(:passenger, :string)
