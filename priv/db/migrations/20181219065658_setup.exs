@@ -14,7 +14,7 @@ defmodule XUber.Repo.Migrations.Setup do
     end
 
     create table(:pickups) do
-      add(:pickup_request_id, references(:pickup_requests))
+      add(:pickup_request_id, references(:pickup_requests), null: false)
       add(:driver, :string, null: false)
       add(:passenger, :string, null: false)
       add(:state, :string, null: false)
@@ -27,7 +27,7 @@ defmodule XUber.Repo.Migrations.Setup do
     end
 
     create table(:rides) do
-      add(:pickup_id, references(:pickups))
+      add(:pickup_id, references(:pickups), null: false)
       add(:driver, :string, null: false)
       add(:passenger, :string, null: false)
       add(:state, :string, null: false)
