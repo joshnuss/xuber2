@@ -7,12 +7,13 @@ defmodule XUber.Grid do
     do: Supervisor.start_link(__MODULE__, :ok, name: XUber.Grid)
 
   def init(:ok) do
-    children = Enum.map grid_coordinates(), fn coordinates ->
-      id = to_name(coordinates)
-      mfa = {XUber.Tile, :start_link, [id, coordinates]}
+    children =
+      Enum.map(grid_coordinates(), fn coordinates ->
+        id = to_name(coordinates)
+        mfa = {XUber.Tile, :start_link, [id, coordinates]}
 
-      %{id: id, start: mfa}
-    end
+        %{id: id, start: mfa}
+      end)
 
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -31,7 +32,7 @@ defmodule XUber.Grid do
     |> surrounding(radius)
     |> Enum.map(&call(&1, {:nearby, coordinates, radius, options}))
     |> Enum.map(fn {:ok, response} -> response end)
-    |> List.flatten
+    |> List.flatten()
     |> Enum.sort(fn {_, _, a}, {_, _, b} -> a >= b end)
   end
 
@@ -39,8 +40,10 @@ defmodule XUber.Grid do
     cond do
       radius < @tile_size ->
         [coordinates]
+
       true ->
-        [] # TODO: determine tiles inside radius
+        # TODO: determine tiles inside radius
+        []
     end
   end
 

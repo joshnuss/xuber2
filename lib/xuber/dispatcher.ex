@@ -13,7 +13,7 @@ defmodule XUber.Dispatcher do
   def start_link([passenger, coordinates]) do
     state = %{
       passenger: passenger,
-      coordinates: coordinates,
+      coordinates: coordinates
     }
 
     GenServer.start_link(__MODULE__, state, [])
@@ -33,9 +33,11 @@ defmodule XUber.Dispatcher do
 
     nearest = Grid.nearby(coordinates, @search_radius)
 
-    {driver, _position, _distance} = nearest
+    {driver, _position, _distance} =
+      nearest
       |> Enum.filter(fn {pid, _position, _distance} -> pid !== passenger end)
-      |> List.first # TODO: ensure it's an available driver
+      # TODO: ensure it's an available driver
+      |> List.first()
 
     PubSub.publish(:dispatcher, {:assigned, driver, passenger})
 

@@ -7,7 +7,7 @@ defmodule XUber.Ride do
     state = %{
       passenger: passenger,
       driver: driver,
-      points: [coordinates],
+      points: [coordinates]
     }
 
     GenServer.start_link(__MODULE__, state, [])
@@ -18,10 +18,10 @@ defmodule XUber.Ride do
     {:ok, state}
   end
 
-  def handle_call({:move, coordinates}, _from, state=%{points: points}) do
+  def handle_call({:move, coordinates}, _from, state = %{points: points}) do
     PubSub.publish(:ride, {self(), :move, coordinates})
 
-    {:reply, :ok, %{state | points: [{DateTime.utc_now, coordinates}|points]}}
+    {:reply, :ok, %{state | points: [{DateTime.utc_now(), coordinates} | points]}}
   end
 
   def handle_call(:complete, _from, state) do

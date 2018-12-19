@@ -13,7 +13,7 @@ defmodule XUber.Application do
       XUber.UserSupervisor,
       XUber.DispatcherSupervisor,
       XUber.PickupSupervisor,
-      XUber.RideSupervisor,
+      XUber.RideSupervisor
     ]
 
     opts = [strategy: :one_for_one, name: XUber.Supervisor]

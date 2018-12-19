@@ -5,10 +5,10 @@ defmodule XUber.Tile do
 
   @tile_size Application.get_env(:xuber, :tile_size)
 
-  def start_link(name, coordinates={lat, lng}) do
+  def start_link(name, coordinates = {lat, lng}) do
     state = %{
       jurisdiction: {coordinates, {lat + @tile_size, lng + @tile_size}},
-      pids: %{},
+      pids: %{}
     }
 
     GenServer.start_link(__MODULE__, state, name: name)
@@ -37,17 +37,18 @@ defmodule XUber.Tile do
       Grid.join(pid, coordinates)
 
       {:reply, :ok, remove(state, pid)}
-     else
+    else
       {:reply, :ok, put_in(state[:pids][pid][:position], coordinates)}
     end
   end
 
   def handle_call({:nearby, from, radius, filters}, _from, state) do
-    results = state.pids
-              |> Enum.into([])
-              |> Enum.filter(fn {_pid, %{traits: traits}} -> (filters -- traits) == [] end)
-              |> Enum.map(fn {pid, %{position: to}} -> {pid, to, Geometry.distance(from, to)} end)
-              |> Enum.filter(fn {_pid, _position, distance} -> distance < radius end)
+    results =
+      state.pids
+      |> Enum.into([])
+      |> Enum.filter(fn {_pid, %{traits: traits}} -> filters -- traits == [] end)
+      |> Enum.map(fn {pid, %{position: to}} -> {pid, to, Geometry.distance(from, to)} end)
+      |> Enum.filter(fn {_pid, _position, distance} -> distance < radius end)
 
     {:reply, {:ok, results}, state}
   end

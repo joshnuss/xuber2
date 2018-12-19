@@ -20,6 +20,7 @@ defmodule XUber.Passenger do
       ride: nil,
       driver: nil
     }
+
     name = String.to_atom(user.name)
 
     GenStateMachine.start_link(__MODULE__, data, name: name)
@@ -71,7 +72,13 @@ defmodule XUber.Passenger do
     {:next_state, :online, new_data, reply}
   end
 
-  def handle_event({:call, from}, {:depart, ride}, :waiting, data=%{pickup: pickup, driver: driver}) when not is_nil(driver) and not is_nil(pickup) do
+  def handle_event(
+        {:call, from},
+        {:depart, ride},
+        :waiting,
+        data = %{pickup: pickup, driver: driver}
+      )
+      when not is_nil(driver) and not is_nil(pickup) do
     PubSub.publish(:passenger, {data.user, :depart, ride})
 
     reply = {:reply, from, :ok}
@@ -80,7 +87,7 @@ defmodule XUber.Passenger do
     {:next_state, :riding, new_data, reply}
   end
 
-  def handle_event({:call, from}, :arrive, :riding, data=%{ride: ride}) when not is_nil(ride) do
+  def handle_event({:call, from}, :arrive, :riding, data = %{ride: ride}) when not is_nil(ride) do
     PubSub.publish(:passenger, {data.user, :arrive, data.coordinates})
 
     reply = {:reply, from, :ok}

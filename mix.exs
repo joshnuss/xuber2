@@ -6,7 +6,7 @@ defmodule XUber.Mixfile do
       app: :xuber,
       version: "0.1.0",
       elixir: "~> 1.5",
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
   end
@@ -23,8 +23,9 @@ defmodule XUber.Mixfile do
   defp deps do
     [
       {:pubsub, "~> 1.0"},
-      #{:gen_state_machine, "~> 2.0.4"}
-      {:gen_state_machine, git: "https://github.com/joshnuss/gen_state_machine", branch: "add-child-spec"},
+      # {:gen_state_machine, "~> 2.0.4"}
+      {:gen_state_machine,
+       git: "https://github.com/joshnuss/gen_state_machine", branch: "add-child-spec"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"}
     ]

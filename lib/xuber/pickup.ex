@@ -6,7 +6,7 @@ defmodule XUber.Pickup do
       passenger: passenger,
       driver: driver,
       coordinates: coordinates,
-      points: [],
+      points: []
     }
 
     GenServer.start_link(__MODULE__, state, [])
@@ -16,8 +16,8 @@ defmodule XUber.Pickup do
     {:ok, state}
   end
 
-  def handle_call({:move, coordinates}, _from, state=%{points: points}),
-    do: {:reply, :ok, %{state | points: [{DateTime.utc_now, coordinates}|points]}}
+  def handle_call({:move, coordinates}, _from, state = %{points: points}),
+    do: {:reply, :ok, %{state | points: [{DateTime.utc_now(), coordinates} | points]}}
 
   def handle_call(:cancel, _from, state),
     do: {:stop, :normal, :ok, state}

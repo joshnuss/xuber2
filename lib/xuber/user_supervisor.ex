@@ -9,10 +9,10 @@ defmodule XUber.UserSupervisor do
   def init(:ok),
     do: DynamicSupervisor.init(strategy: :one_for_one)
 
-  def start_child(user=%User{type: :passenger}, coordinates),
+  def start_child(user = %User{type: :passenger}, coordinates),
     do: do_start_child({Passenger, [user, coordinates]})
 
-  def start_child(user=%User{type: :driver}, coordinates),
+  def start_child(user = %User{type: :driver}, coordinates),
     do: do_start_child({Driver, [user, coordinates]})
 
   defp do_start_child(child_spec),

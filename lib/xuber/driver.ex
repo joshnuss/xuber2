@@ -6,7 +6,7 @@ defmodule XUber.Driver do
     RideSupervisor,
     Passenger,
     Pickup,
-    Ride,
+    Ride
   }
 
   def start_link([user, coordinates]) do
@@ -15,8 +15,9 @@ defmodule XUber.Driver do
       coordinates: coordinates,
       pickup: nil,
       passenger: nil,
-      ride: nil,
+      ride: nil
     }
+
     name = String.to_atom(user.name)
 
     GenStateMachine.start_link(__MODULE__, data, name: name)
@@ -44,7 +45,8 @@ defmodule XUber.Driver do
     {:next_state, :online, data, reply}
   end
 
-  def handle_event({:call, from}, :offline, status, data) when status == :available or status == :online do
+  def handle_event({:call, from}, :offline, status, data)
+      when status == :available or status == :online do
     PubSub.publish(:driver, {data.user, :offline})
     reply = {:reply, from, :ok}
 
@@ -75,7 +77,8 @@ defmodule XUber.Driver do
     {:next_state, :riding, new_data, reply}
   end
 
-  def handle_event({:call, from}, :dropoff, :riding, data=%{ride: ride}) when not is_nil(ride) do
+  def handle_event({:call, from}, :dropoff, :riding, data = %{ride: ride})
+      when not is_nil(ride) do
     PubSub.publish(:driver, {data.user, :dropoff, data.passenger, data.coordinates})
 
     :ok = Ride.complete(ride)
