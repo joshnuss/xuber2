@@ -1,0 +1,19 @@
+defmodule XUber.DB.Ride do
+  use Ecto.Schema
+
+  alias XUber.DB.Pickup
+
+  schema "rides" do
+    belongs_to(:pickup, Pickup)
+
+    field(:driver, :string)
+    field(:passenger, :string)
+    field(:state, :string, default: "dispatched")
+    field(:departed_at, :utc_datetime)
+    field(:arrived_at, :utc_datetime)
+    field(:latitude, :float)
+    field(:longitude, :float)
+
+    timestamps()
+  end
+end
