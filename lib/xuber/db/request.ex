@@ -1,7 +1,7 @@
-defmodule XUber.DB.PickupRequest do
+defmodule XUber.DB.Request do
   use Ecto.Schema
 
-  schema "pickup_requests" do
+  schema "requests" do
     field(:passenger, :string)
     field(:state, :string, default: "searching")
     field(:from_latitude, :float)

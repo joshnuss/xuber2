@@ -3,11 +3,11 @@ defmodule XUber.DB.Pickup do
 
   alias XUber.DB.{
     Log,
-    PickupRequest
+    Request
   }
 
   schema "pickups" do
-    belongs_to(:pickup_request, PickupRequest)
+    belongs_to(:request, Request)
     has_many(:logs, Log)
 
     field(:driver, :string)

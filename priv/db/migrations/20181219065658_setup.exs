@@ -2,7 +2,7 @@ defmodule XUber.Repo.Migrations.Setup do
   use Ecto.Migration
 
   def change do
-    create table(:pickup_requests) do
+    create table(:requests) do
       add(:passenger, :string, null: false)
       add(:state, :string, null: false)
       add(:from_latitude, :float, null: false)
@@ -14,7 +14,7 @@ defmodule XUber.Repo.Migrations.Setup do
     end
 
     create table(:pickups) do
-      add(:pickup_request_id, references(:pickup_requests), null: false)
+      add(:request_id, references(:requests), null: false)
       add(:driver, :string, null: false)
       add(:passenger, :string, null: false)
       add(:state, :string, null: false)
