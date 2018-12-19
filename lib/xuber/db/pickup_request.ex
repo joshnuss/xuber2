@@ -1,8 +1,6 @@
 defmodule XUber.DB.PickupRequest do
   use Ecto.Schema
 
-  alias XUber.DB.Point
-
   schema "pickup_requests" do
     field(:passenger, :string)
     field(:state, :string, default: "searching")
