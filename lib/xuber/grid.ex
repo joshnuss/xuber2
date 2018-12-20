@@ -48,7 +48,7 @@ defmodule XUber.Grid do
   end
 
   defp origin({latitude, longitude}),
-    do: {div(latitude, @tile_size), div(longitude, @tile_size)}
+    do: {div(trunc(latitude), @tile_size), div(trunc(longitude), @tile_size)}
 
   defp to_name(coordinates) do
     {latitude, longitude} = origin(coordinates)
