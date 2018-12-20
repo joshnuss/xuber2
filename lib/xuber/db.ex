@@ -13,11 +13,10 @@ defmodule XUber.DB do
     Ride
   }
 
-  def create_request(
-        passenger,
-        _from = {from_latitude, from_longitude},
-        _to = {to_latitude, to_longitude}
-      ) do
+  def create_request(passenger, from, to) do
+    {from_latitude, from_longitude} = from
+    {to_latitude, to_longitude} = to
+
     request = %Request{
       passenger: passenger,
       from_latitude: from_latitude,
