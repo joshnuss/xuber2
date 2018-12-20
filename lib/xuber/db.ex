@@ -38,7 +38,10 @@ defmodule XUber.DB do
       departed_at: DateTime.utc_now()
     }
 
-    Repo.insert(pickup)
+    Multi.new()
+    |> Multi.update(:request, request_assigned(request))
+    |> Multi.insert(:pickup, pickup)
+    |> Repo.transaction()
   end
 
   def create_ride(pickup) do
@@ -57,8 +60,8 @@ defmodule XUber.DB do
     |> Repo.transaction()
   end
 
-  def ride_arrived(ride) do
-    ride = Changeset.change(ride, state: "arrived", arrived_at: DateTime.utc_now())
+  def ride_completed(ride) do
+    ride = Changeset.change(ride, status: "completed", completed_at: DateTime.utc_now())
 
     Repo.update(ride)
   end
@@ -80,6 +83,10 @@ defmodule XUber.DB do
   end
 
   defp pickup_arrived(pickup) do
-    Changeset.change(pickup, state: "arrived", arrived_at: DateTime.utc_now())
+    Changeset.change(pickup, status: "arrived", arrived_at: DateTime.utc_now())
+  end
+
+  defp request_assigned(request) do
+    Changeset.change(request, status: "assigned")
   end
 end

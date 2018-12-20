@@ -12,7 +12,7 @@ defmodule XUber.DB.Ride do
 
     field(:driver, :string)
     field(:passenger, :string)
-    field(:state, :string, default: "departed")
+    field(:status, :string, default: "departed")
     field(:departed_at, :utc_datetime_usec)
     field(:arrived_at, :utc_datetime_usec)
     field(:latitude, :float)
