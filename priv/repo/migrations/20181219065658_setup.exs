@@ -18,8 +18,8 @@ defmodule XUber.Repo.Migrations.Setup do
       add(:driver, :string, null: false)
       add(:passenger, :string, null: false)
       add(:state, :string, null: false)
-      add(:departed_at, :utc_datetime)
-      add(:arrived_at, :utc_datetime)
+      add(:departed_at, :utc_datetime_usec)
+      add(:arrived_at, :utc_datetime_usec)
       add(:latitude, :float, null: false)
       add(:longitude, :float, null: false)
 
@@ -31,8 +31,8 @@ defmodule XUber.Repo.Migrations.Setup do
       add(:driver, :string, null: false)
       add(:passenger, :string, null: false)
       add(:state, :string, null: false)
-      add(:departed_at, :utc_datetime)
-      add(:arrived_at, :utc_datetime)
+      add(:departed_at, :utc_datetime_usec)
+      add(:arrived_at, :utc_datetime_usec)
       add(:latitude, :float, null: false)
       add(:longitude, :float, null: false)
 
