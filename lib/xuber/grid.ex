@@ -1,7 +1,7 @@
 defmodule XUber.Grid do
   use Supervisor
 
-  @tile_size Application.get_env(:xuber, :tile_size)
+  @cell_size Application.get_env(:xuber, :cell_size)
 
   def start_link(_),
     do: Supervisor.start_link(__MODULE__, :ok, name: XUber.Grid)
@@ -10,7 +10,7 @@ defmodule XUber.Grid do
     children =
       Enum.map(grid_coordinates(), fn coordinates ->
         id = to_name(coordinates)
-        mfa = {XUber.Tile, :start_link, [id, coordinates]}
+        mfa = {XUber.Cell, :start_link, [id, coordinates]}
 
         %{id: id, start: mfa}
       end)
@@ -38,22 +38,22 @@ defmodule XUber.Grid do
 
   defp surrounding(coordinates, radius) do
     cond do
-      radius < @tile_size ->
+      radius < @cell_size ->
         [coordinates]
 
       true ->
-        # TODO: determine tiles inside radius
+        # TODO: determine cells inside radius
         []
     end
   end
 
   defp origin({latitude, longitude}),
-    do: {div(trunc(latitude), @tile_size), div(trunc(longitude), @tile_size)}
+    do: {div(trunc(latitude), @cell_size), div(trunc(longitude), @cell_size)}
 
   defp to_name(coordinates) do
     {latitude, longitude} = origin(coordinates)
 
-    :"tile-#{latitude}-#{longitude}"
+    :"cell-#{latitude}-#{longitude}"
   end
 
   defp call(coordinates, arguments) do
@@ -65,8 +65,8 @@ defmodule XUber.Grid do
   defp grid_coordinates do
     for latitude <- -90..90,
         longitude <- -180..180,
-        rem(latitude, @tile_size) == 0,
-        rem(longitude, @tile_size) == 0 do
+        rem(latitude, @cell_size) == 0,
+        rem(longitude, @cell_size) == 0 do
       {latitude, longitude}
     end
   end

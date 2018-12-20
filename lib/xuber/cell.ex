@@ -1,13 +1,13 @@
-defmodule XUber.Tile do
+defmodule XUber.Cell do
   use GenServer
 
   alias XUber.{Geometry, Grid}
 
-  @tile_size Application.get_env(:xuber, :tile_size)
+  @cell_size Application.get_env(:xuber, :cell_size)
 
   def start_link(name, coordinates = {lat, lng}) do
     state = %{
-      jurisdiction: {coordinates, {lat + @tile_size, lng + @tile_size}},
+      jurisdiction: {coordinates, {lat + @cell_size, lng + @cell_size}},
       pids: %{}
     }
 

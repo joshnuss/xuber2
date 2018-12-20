@@ -3,7 +3,7 @@
 use Mix.Config
 
 config :xuber,
-  tile_size: 10
+  cell_size: 10
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
