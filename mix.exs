@@ -23,9 +23,7 @@ defmodule XUber.Mixfile do
   defp deps do
     [
       {:pubsub, "~> 1.0"},
-      # {:gen_state_machine, "~> 2.0.4"}
-      {:gen_state_machine,
-       git: "https://github.com/joshnuss/gen_state_machine", branch: "add-child-spec"},
+      {:gen_state_machine, "~> 2.0.4"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"}
     ]
