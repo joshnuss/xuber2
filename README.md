@@ -1,6 +1,6 @@
 # XUber
 
-A reference design of a ride sharing application (eg Uber, Lyft, etc)
+A reference design for a ride sharing application (similar to Uber & Lyft)
 
 ## Overview
 
