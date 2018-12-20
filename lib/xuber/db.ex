@@ -5,6 +5,7 @@ defmodule XUber.DB do
   }
 
   alias XUber.Repo
+
   alias XUber.DB.{
     Log,
     Pickup,
@@ -12,7 +13,11 @@ defmodule XUber.DB do
     Ride
   }
 
-  def create_request(passenger, _from={from_latitude, from_longitude}, _to={to_latitude, to_longitude}) do
+  def create_request(
+        passenger,
+        _from = {from_latitude, from_longitude},
+        _to = {to_latitude, to_longitude}
+      ) do
     request = %Request{
       passenger: passenger,
       from_latitude: from_latitude,
@@ -59,11 +64,11 @@ defmodule XUber.DB do
     Repo.update(ride)
   end
 
-  def log_pickup_location(pickup=%Pickup{}, location) do
+  def log_pickup_location(pickup = %Pickup{}, location) do
     log_location(:pickup_id, pickup.id, location)
   end
 
-  def log_ride_location(ride=%Ride{}, location) do
+  def log_ride_location(ride = %Ride{}, location) do
     log_location(:ride_id, ride.id, location)
   end
 
