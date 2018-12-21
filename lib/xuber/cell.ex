@@ -46,7 +46,7 @@ defmodule XUber.Cell do
     results =
       state.pids
       |> Enum.into([])
-      |> Enum.filter(fn {_pid, %{traits: traits}} -> filters -- traits == [] end)
+      |> Enum.filter(fn {_pid, %{traits: traits}} -> subset?(traits, filters) end)
       |> Enum.map(fn {pid, %{position: to}} -> {pid, to, Geometry.distance(from, to)} end)
       |> Enum.filter(fn {_pid, _position, distance} -> distance < radius end)
 
@@ -61,5 +61,12 @@ defmodule XUber.Cell do
     Process.demonitor(state.pids[pid].ref)
 
     %{state | pids: Map.delete(state.pids, pid)}
+  end
+
+  defp subset?(traits, filters) do
+    traits = MapSet.new(traits)
+    filters = MapSet.new(filters)
+
+    MapSet.subset?(traits, filters)
   end
 end

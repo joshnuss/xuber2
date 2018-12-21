@@ -52,12 +52,11 @@ defmodule XUber.Dispatcher do
   end
 
   defp find_driver(passenger, coordinates) do
-    nearest = Grid.nearby(coordinates, @search_radius)
+    nearest = Grid.nearby(coordinates, @search_radius, [:driver])
 
     {driver, _position, _distance} =
       nearest
       |> Enum.filter(fn {pid, _position, _distance} -> pid !== passenger end)
-      # TODO: ensure it's an available driver
       |> List.first()
 
     {:ok, driver}

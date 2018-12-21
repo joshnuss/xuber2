@@ -27,10 +27,10 @@ defmodule XUber.Grid do
   def update(pid, last_position, new_position),
     do: call(last_position, {:update, pid, new_position})
 
-  def nearby(coordinates, radius, options \\ []) do
+  def nearby(coordinates, radius, filters \\ []) do
     coordinates
     |> surrounding(radius)
-    |> Enum.map(&call(&1, {:nearby, coordinates, radius, options}))
+    |> Enum.map(&call(&1, {:nearby, coordinates, radius, filters}))
     |> Enum.map(fn {:ok, response} -> response end)
     |> List.flatten()
     |> Enum.sort(fn {_, _, a}, {_, _, b} -> a >= b end)
