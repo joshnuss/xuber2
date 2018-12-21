@@ -9,7 +9,7 @@ defmodule XUber.Grid do
   def init(:ok) do
     children =
       Enum.map(grid_coordinates(), fn coordinates ->
-        id = to_name(coordinates)
+        id = cell_name(coordinates)
         mfa = {XUber.Cell, :start_link, [id, coordinates]}
 
         %{id: id, start: mfa}
@@ -50,7 +50,7 @@ defmodule XUber.Grid do
   defp origin({latitude, longitude}),
     do: {truncate(latitude), truncate(longitude)}
 
-  defp to_name(coordinates) do
+  defp cell_name(coordinates) do
     {latitude, longitude} = origin(coordinates)
 
     :"cell-#{latitude}-#{longitude}"
@@ -64,7 +64,7 @@ defmodule XUber.Grid do
 
   defp call(coordinates, arguments) do
     coordinates
-    |> to_name
+    |> cell_name()
     |> GenServer.call(arguments)
   end
 
