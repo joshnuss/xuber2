@@ -29,14 +29,14 @@ defmodule XUber.Grid do
 
   def nearby(coordinates, radius, filters \\ []) do
     coordinates
-    |> surrounding(radius)
+    |> surrounding_cells(radius)
     |> Enum.map(&call_cell(&1, {:nearby, coordinates, radius, filters}))
     |> Enum.map(fn {:ok, response} -> response end)
     |> List.flatten()
     |> Enum.sort(fn {_, _, a}, {_, _, b} -> a >= b end)
   end
 
-  defp surrounding(coordinates, radius) do
+  defp surrounding_cells(coordinates, radius) do
     cond do
       radius < @cell_size ->
         [coordinates]
