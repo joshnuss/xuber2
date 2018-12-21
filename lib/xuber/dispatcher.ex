@@ -29,7 +29,7 @@ defmodule XUber.Dispatcher do
     do: {:stop, :normal, :ok, state}
 
   def handle_info(:request, state = %{request: request, passenger: passenger}) do
-    coordinates = { request.from_latitude, request.from_longitude}
+    coordinates = {request.from_latitude, request.from_longitude}
     PubSub.publish(:dispatcher, {:request, coordinates, passenger})
 
     {:ok, driver} = find_driver(passenger, coordinates)
