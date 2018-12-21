@@ -18,6 +18,9 @@ Ride sharing apps are uniquely suited to Elixir/Erlang because the are:
 
 ```bash
 hub clone joshnuss/xuber2
+cd xuber2
+mix deps.get
+mix do ecto.create, ecto.migrate
 ```
 
 ## Running examples
