@@ -48,12 +48,18 @@ defmodule XUber.Grid do
   end
 
   defp origin({latitude, longitude}),
-    do: {div(trunc(latitude), @cell_size), div(trunc(longitude), @cell_size)}
+    do: {truncate(latitude), truncate(longitude)}
 
   defp to_name(coordinates) do
     {latitude, longitude} = origin(coordinates)
 
     :"cell-#{latitude}-#{longitude}"
+  end
+
+  defp truncate(n) do
+    n
+    |> trunc()
+    |> div(@cell_size)
   end
 
   defp call(coordinates, arguments) do
