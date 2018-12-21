@@ -19,18 +19,18 @@ defmodule XUber.Grid do
   end
 
   def join(pid, coordinates, traits \\ []),
-    do: call(coordinates, {:join, pid, coordinates, traits})
+    do: call_cell(coordinates, {:join, pid, coordinates, traits})
 
   def leave(pid, coordinates),
-    do: call(coordinates, {:leave, pid})
+    do: call_cell(coordinates, {:leave, pid})
 
   def update(pid, last_position, new_position),
-    do: call(last_position, {:update, pid, new_position})
+    do: call_cell(last_position, {:update, pid, new_position})
 
   def nearby(coordinates, radius, filters \\ []) do
     coordinates
     |> surrounding(radius)
-    |> Enum.map(&call(&1, {:nearby, coordinates, radius, filters}))
+    |> Enum.map(&call_cell(&1, {:nearby, coordinates, radius, filters}))
     |> Enum.map(fn {:ok, response} -> response end)
     |> List.flatten()
     |> Enum.sort(fn {_, _, a}, {_, _, b} -> a >= b end)
@@ -62,7 +62,7 @@ defmodule XUber.Grid do
     |> div(@cell_size)
   end
 
-  defp call(coordinates, arguments) do
+  defp call_cell(coordinates, arguments) do
     coordinates
     |> cell_name()
     |> GenServer.call(arguments)
