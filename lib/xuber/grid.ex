@@ -33,7 +33,7 @@ defmodule XUber.Grid do
     |> Enum.map(&call_cell(&1, {:nearby, coordinates, radius, filters}))
     |> Enum.map(fn {:ok, response} -> response end)
     |> List.flatten()
-    |> Enum.sort(fn {_, _, a}, {_, _, b} -> a >= b end)
+    |> Enum.sort(&closest/2)
   end
 
   defp surrounding_cells(coordinates, radius) do
@@ -46,6 +46,9 @@ defmodule XUber.Grid do
         []
     end
   end
+
+  defp closest({_, _, a}, {_, _, b}),
+    do: a >= b
 
   defp origin({latitude, longitude}),
     do: {truncate(latitude), truncate(longitude)}
