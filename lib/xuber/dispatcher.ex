@@ -32,6 +32,26 @@ defmodule XUber.Dispatcher do
     coordinates = { request.from_latitude, request.from_longitude}
     PubSub.publish(:dispatcher, {:request, coordinates, passenger})
 
+    {:ok, driver} = find_driver(passenger, coordinates)
+
+    PubSub.publish(:dispatcher, {:assigned, driver, passenger})
+
+    {:ok, pickup} = create_pickup(request, driver)
+
+    Driver.dispatch(driver, pickup, passenger)
+    Passenger.dispatched(passenger, pickup, driver)
+
+    {:noreply, state}
+  end
+
+  defp create_pickup(request, driver) do
+    {:ok, user} = Driver.get_user(driver)
+    {:ok, %{pickup: pickup}} = DB.create_pickup(request, user.name)
+
+    {:ok, pickup}
+  end
+
+  defp find_driver(passenger, coordinates) do
     nearest = Grid.nearby(coordinates, @search_radius)
 
     {driver, _position, _distance} =
@@ -40,15 +60,7 @@ defmodule XUber.Dispatcher do
       # TODO: ensure it's an available driver
       |> List.first()
 
-    PubSub.publish(:dispatcher, {:assigned, driver, passenger})
-
-    {:ok, user} = Driver.get_user(driver)
-    {:ok, %{pickup: pickup}} = DB.create_pickup(request, user.name)
-
-    Driver.dispatch(driver, pickup, passenger)
-    Passenger.dispatched(passenger, pickup, driver)
-
-    {:noreply, state}
+    {:ok, driver}
   end
 
   def cancel(pid),
