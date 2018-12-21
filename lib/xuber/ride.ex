@@ -25,6 +25,8 @@ defmodule XUber.Ride do
   def handle_call({:move, coordinates}, _from, state = %{points: points}) do
     PubSub.publish(:ride, {self(), :move, coordinates})
 
+    DB.log_ride_location(state.ride, coordinates)
+
     {:reply, :ok, %{state | points: [{DateTime.utc_now(), coordinates} | points]}}
   end
 
