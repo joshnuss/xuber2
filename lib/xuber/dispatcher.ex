@@ -42,7 +42,7 @@ defmodule XUber.Dispatcher do
 
     PubSub.publish(:dispatcher, {:assigned, driver, passenger})
 
-    {:ok, pickup} = PickupSupervisor.start_child(driver, passenger, request)
+    {:ok, pickup} = PickupSupervisor.start_child(driver, request)
 
     Driver.dispatch(driver, pickup, passenger)
     Passenger.dispatched(passenger, pickup, driver)

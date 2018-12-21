@@ -15,10 +15,10 @@ defmodule XUber.PickupSupervisor do
   def init(:ok),
     do: DynamicSupervisor.init(strategy: :one_for_one)
 
-  def start_child(driver, passenger, request) do
+  def start_child(driver, request) do
     {:ok, user} = Driver.get_user(driver)
-    {:ok, pickup} = DB.create_pickup(request, user.name)
+    {:ok, %{pickup: pickup}} = DB.create_pickup(request, user.name)
 
-    DynamicSupervisor.start_child(@name, {Pickup, [driver, passenger, pickup]})
+    DynamicSupervisor.start_child(@name, {Pickup, [pickup]})
   end
 end

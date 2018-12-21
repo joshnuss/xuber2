@@ -1,23 +1,21 @@
 defmodule XUber.Pickup do
   use GenServer, restart: :transient
 
-  def start_link([passenger, driver, pickup]) do
-    state = %{
-      passenger: passenger,
-      driver: driver,
-      pickup: pickup,
-      points: []
-    }
+  alias XUber.DB
 
-    GenServer.start_link(__MODULE__, state, [])
+  def start_link([pickup]) do
+    GenServer.start_link(__MODULE__, pickup, [])
   end
 
   def init(state) do
     {:ok, state}
   end
 
-  def handle_call({:move, coordinates}, _from, state = %{points: points}),
-    do: {:reply, :ok, %{state | points: [{DateTime.utc_now(), coordinates} | points]}}
+  def handle_call({:move, coordinates}, _from, pickup) do
+    {:ok, _log} = DB.log_pickup_location(pickup, coordinates)
+
+    {:reply, :ok, pickup}
+  end
 
   def handle_call(:cancel, _from, state),
     do: {:stop, :normal, :ok, state}
