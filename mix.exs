@@ -25,7 +25,8 @@ defmodule XUber.Mixfile do
       {:pubsub, "~> 1.0"},
       {:gen_state_machine, "~> 2.0.4"},
       {:ecto_sql, "~> 3.0"},
-      {:postgrex, ">= 0.0.0"}
+      {:postgrex, ">= 0.0.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 end
