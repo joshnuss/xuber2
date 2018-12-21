@@ -103,6 +103,12 @@ defmodule XUber.Driver do
     {:keep_state, new_data, reply}
   end
 
+  def handle_event({:call, from}, :get_user, _any, data) do
+    reply = {:reply, from, {:ok, data.user}}
+
+    {:keep_state, data, reply}
+  end
+
   def offline(pid),
     do: GenStateMachine.call(pid, :offline)
 

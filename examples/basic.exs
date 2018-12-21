@@ -4,9 +4,9 @@ alias XUber.{User, Driver, Passenger, Ride, UserSupervisor}
 
 defmodule ProcessName do
   def find_name(pid) do
-    info = Process.info(pid)
+    {:ok, user} = GenServer.call(pid, :get_user)
 
-    Keyword.get(info, :registered_name, pid)
+    user.name
   end
 end
 

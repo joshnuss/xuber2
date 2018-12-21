@@ -121,6 +121,12 @@ defmodule XUber.Passenger do
     {:keep_state, data}
   end
 
+  def handle_event({:call, from}, :get_user, _any, data) do
+    reply = {:reply, from, {:ok, data.user}}
+
+    {:keep_state, data, reply}
+  end
+
   def offline(pid),
     do: GenStateMachine.call(pid, :offline)
 
