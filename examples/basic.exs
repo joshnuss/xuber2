@@ -210,15 +210,15 @@ Driver.available(driver)
 
 :timer.sleep(3000)
 
-{:ok, _request} = Passenger.request(passenger, {10, 10})
+{:ok, _request} = Passenger.request(passenger, {10.0, 10.0})
 
 :timer.sleep(100)
 
-Driver.move(driver, {10, 15})
+Driver.move(driver, {10.0, 15.0})
 
 :timer.sleep(200)
 
-Driver.move(driver, {10, 16})
+Driver.move(driver, {10.0, 16.0})
 
 :timer.sleep(100)
 :timer.sleep(2000)
@@ -229,7 +229,7 @@ Driver.arrive(driver)
 
 {_, %{ride: ride}} = :sys.get_state(driver)
 
-for position <- [{10, 16}, {10, 17}, {10, 18}] do
+for position <- [{10.0, 16.0}, {10.0, 17.0}, {10.0, 18.0}] do
   Ride.move(ride, position)
   Driver.move(driver, position)
   Passenger.move(passenger, position)
