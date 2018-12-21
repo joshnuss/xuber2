@@ -15,7 +15,7 @@ defmodule XUber.RideSupervisor do
     do: DynamicSupervisor.init(strategy: :one_for_one)
 
   def start_child(pickup, passenger, driver) do
-    {:ok, ride} = DB.create_ride(pickup)
+    {:ok, %{ride: ride}} = DB.create_ride(pickup)
 
     DynamicSupervisor.start_child(@name, {Ride, [ride, passenger, driver]})
   end

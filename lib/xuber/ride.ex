@@ -1,7 +1,10 @@
 defmodule XUber.Ride do
   use GenServer, restart: :transient
 
-  alias XUber.Passenger
+  alias XUber.{
+    DB,
+    Passenger
+  }
 
   def start_link([ride, passenger, driver]) do
     state = %{
@@ -27,6 +30,8 @@ defmodule XUber.Ride do
 
   def handle_call(:complete, _from, state) do
     {_data, coordinates} = hd(state.points)
+
+    {:ok, _ride} = DB.complete_ride(state.ride)
 
     PubSub.publish(:ride, {self(), :complete, coordinates})
     Passenger.arrive(state.passenger)

@@ -60,7 +60,7 @@ defmodule XUber.DB do
     |> Repo.transaction()
   end
 
-  def ride_completed(ride) do
+  def complete_ride(ride) do
     ride = Changeset.change(ride, status: "completed", completed_at: DateTime.utc_now())
 
     Repo.update(ride)
