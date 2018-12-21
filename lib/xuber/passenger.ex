@@ -3,7 +3,6 @@ defmodule XUber.Passenger do
 
   alias XUber.{
     Grid,
-    Pickup,
     DispatcherSupervisor
   }
 
@@ -66,7 +65,9 @@ defmodule XUber.Passenger do
   def handle_event({:call, from}, :cancel, :waiting, data) do
     PubSub.publish(:passenger, {data.user, :cancel, data.pickup})
 
-    reply = {:reply, from, Pickup.cancel(data.pickup)}
+    # TODO: cancel pickup
+
+    reply = {:reply, from, :ok}
     new_data = %{data | pickup: nil}
 
     {:next_state, :online, new_data, reply}

@@ -98,7 +98,7 @@ defmodule Driver.EventLogger do
   end
 
   defp message({driver, :dispatch, pickup, passenger}) do
-    "Driver `#{driver.name}` has been notified to pickup passenger `#{find_name passenger}`, pickup #{inspect pickup}"
+    "Driver `#{driver.name}` has been notified to pickup passenger `#{find_name passenger}`, pickup ##{pickup.id}"
   end
 
   defp message({driver, :departed, ride}) do
@@ -166,7 +166,7 @@ defmodule Passenger.EventLogger do
   end
 
   defp message({passenger, :dispatched, pickup, driver}) do
-    "Passenger `#{passenger.name}` has been notified that driver `#{find_name driver}` will pick them up, pickup #{inspect pickup}"
+    "Passenger `#{passenger.name}` has been notified that driver `#{find_name driver}` will pick them up, pickup ##{pickup.id}"
   end
 
   defp message({passenger, :depart, ride}) do

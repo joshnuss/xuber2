@@ -2,7 +2,7 @@ defmodule XUber.Dispatcher do
   use GenServer
 
   alias XUber.{
-    PickupSupervisor,
+    DB,
     Driver,
     Passenger,
     Grid
@@ -42,7 +42,8 @@ defmodule XUber.Dispatcher do
 
     PubSub.publish(:dispatcher, {:assigned, driver, passenger})
 
-    {:ok, pickup} = PickupSupervisor.start_child(driver, request)
+    {:ok, user} = Driver.get_user(driver)
+    {:ok, %{pickup: pickup}} = DB.create_pickup(request, user.name)
 
     Driver.dispatch(driver, pickup, passenger)
     Passenger.dispatched(passenger, pickup, driver)

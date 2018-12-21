@@ -1,7 +1,10 @@
 defmodule XUber.RideSupervisor do
   use DynamicSupervisor
 
-  alias XUber.Ride
+  alias XUber.{
+    DB,
+    Ride
+  }
 
   @name __MODULE__
 
@@ -11,6 +14,9 @@ defmodule XUber.RideSupervisor do
   def init(:ok),
     do: DynamicSupervisor.init(strategy: :one_for_one)
 
-  def start_child(passenger, driver, coordinates),
-    do: DynamicSupervisor.start_child(@name, {Ride, [passenger, driver, coordinates]})
+  def start_child(pickup, passenger, driver) do
+    {:ok, ride} = DB.create_ride(pickup)
+
+    DynamicSupervisor.start_child(@name, {Ride, [ride, passenger, driver]})
+  end
 end

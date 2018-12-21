@@ -3,11 +3,12 @@ defmodule XUber.Ride do
 
   alias XUber.Passenger
 
-  def start_link([passenger, driver, coordinates]) do
+  def start_link([ride, passenger, driver]) do
     state = %{
+      ride: ride,
       passenger: passenger,
       driver: driver,
-      points: [coordinates]
+      points: []
     }
 
     GenServer.start_link(__MODULE__, state, [])

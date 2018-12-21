@@ -19,6 +19,8 @@ defmodule XUber.PickupSupervisor do
     {:ok, user} = Driver.get_user(driver)
     {:ok, %{pickup: pickup}} = DB.create_pickup(request, user.name)
 
-    DynamicSupervisor.start_child(@name, {Pickup, [pickup]})
+    {:ok, pid} = DynamicSupervisor.start_child(@name, {Pickup, [pickup]})
+
+    {:ok, pid, pickup}
   end
 end

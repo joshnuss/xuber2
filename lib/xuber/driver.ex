@@ -2,10 +2,10 @@ defmodule XUber.Driver do
   use GenStateMachine, restart: :transient
 
   alias XUber.{
+    DB,
     Grid,
     RideSupervisor,
     Passenger,
-    Pickup,
     Ride
   }
 
@@ -65,8 +65,7 @@ defmodule XUber.Driver do
   def handle_event({:call, from}, :arrived, :dispatched, data) do
     PubSub.publish(:driver, {data.user, :arrived, data.coordinates})
 
-    :ok = Pickup.complete(data.pickup)
-    {:ok, ride} = RideSupervisor.start_child(data.passenger, self(), data.coordinates)
+    {:ok, ride} = RideSupervisor.start_child(data.pickup, data.passenger, self())
     Passenger.depart(data.passenger, ride)
 
     PubSub.publish(:driver, {data.user, :departed, ride})
@@ -94,7 +93,7 @@ defmodule XUber.Driver do
 
     Grid.update(self(), data.coordinates, coordinates)
 
-    if data.pickup, do: Pickup.move(data.pickup, coordinates)
+    if data.pickup, do: DB.log_pickup_location(data.pickup, coordinates)
     if data.ride, do: Ride.move(data.ride, coordinates)
 
     reply = {:reply, from, :ok}
