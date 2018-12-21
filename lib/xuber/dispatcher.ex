@@ -10,10 +10,10 @@ defmodule XUber.Dispatcher do
 
   @search_radius 5
 
-  def start_link([passenger, coordinates]) do
+  def start_link([passenger, request]) do
     state = %{
       passenger: passenger,
-      coordinates: coordinates
+      request: request
     }
 
     GenServer.start_link(__MODULE__, state, [])
@@ -28,7 +28,8 @@ defmodule XUber.Dispatcher do
   def handle_call(:cancel, _from, state),
     do: {:stop, :normal, :ok, state}
 
-  def handle_info(:request, state = %{coordinates: coordinates, passenger: passenger}) do
+  def handle_info(:request, state = %{request: request, passenger: passenger}) do
+    coordinates = { request.from_latitude, request.from_longitude}
     PubSub.publish(:dispatcher, {:request, coordinates, passenger})
 
     nearest = Grid.nearby(coordinates, @search_radius)

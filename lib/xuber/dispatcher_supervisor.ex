@@ -1,7 +1,10 @@
 defmodule XUber.DispatcherSupervisor do
   use DynamicSupervisor
 
-  alias XUber.Dispatcher
+  alias XUber.{
+    DB,
+    Dispatcher
+  }
 
   @name __MODULE__
 
@@ -12,7 +15,9 @@ defmodule XUber.DispatcherSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_child(passenger, coordinates) do
-    DynamicSupervisor.start_child(@name, {Dispatcher, [passenger, coordinates]})
+  def start_child(passenger, user, from, to) do
+    {:ok, request} = DB.create_request(user.name, from, to)
+
+    DynamicSupervisor.start_child(@name, {Dispatcher, [passenger, request]})
   end
 end

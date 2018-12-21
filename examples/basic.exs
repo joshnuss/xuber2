@@ -157,8 +157,8 @@ defmodule Passenger.EventLogger do
     "Passenger `#{passenger.name}` found drivers: #{text}"
   end
 
-  defp message({passenger, :request, coordinates}) do
-    "Passenger `#{passenger.name}` has requested a pickup at coordinates #{inspect coordinates}"
+  defp message({passenger, :request, from, to}) do
+    "Passenger `#{passenger.name}` has requested a pickup at coordinates #{inspect from} to #{inspect to}"
   end
 
   defp message({passenger, :online}) do
@@ -210,7 +210,7 @@ Driver.available(driver)
 
 :timer.sleep(3000)
 
-{:ok, _request} = Passenger.request(passenger, {10.0, 10.0})
+{:ok, _request} = Passenger.request(passenger, {10.0, 10.0}, {10.0, 12.0})
 
 :timer.sleep(100)
 

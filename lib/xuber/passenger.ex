@@ -44,10 +44,10 @@ defmodule XUber.Passenger do
     {:stop_and_reply, :normal, reply, data}
   end
 
-  def handle_event({:call, from}, {:request, coordinates}, :online, data) do
-    PubSub.publish(:passenger, {data.user, :request, coordinates})
+  def handle_event({:call, from}, {:request, source, destination}, :online, data) do
+    PubSub.publish(:passenger, {data.user, :request, source, destination})
 
-    {:ok, request} = DispatcherSupervisor.start_child(self(), coordinates)
+    {:ok, request} = DispatcherSupervisor.start_child(self(), data.user, source, destination)
     reply = {:reply, from, {:ok, request}}
     new_data = %{data | request: request}
 
@@ -130,8 +130,8 @@ defmodule XUber.Passenger do
   def offline(pid),
     do: GenStateMachine.call(pid, :offline)
 
-  def request(pid, coordinates),
-    do: GenStateMachine.call(pid, {:request, coordinates})
+  def request(pid, from, to),
+    do: GenStateMachine.call(pid, {:request, from, to})
 
   def cancel(pid),
     do: GenStateMachine.call(pid, :cancel)
