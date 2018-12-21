@@ -147,4 +147,7 @@ defmodule XUber.Passenger do
 
   def move(pid, coordinates),
     do: GenStateMachine.call(pid, {:move, coordinates})
+
+  def get_user(pid),
+    do: GenStateMachine.call(pid, :get_user)
 end
