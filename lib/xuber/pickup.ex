@@ -1,11 +1,11 @@
 defmodule XUber.Pickup do
   use GenServer, restart: :transient
 
-  def start_link([passenger, driver, coordinates]) do
+  def start_link([passenger, driver, pickup]) do
     state = %{
       passenger: passenger,
       driver: driver,
-      coordinates: coordinates,
+      pickup: pickup,
       points: []
     }
 
