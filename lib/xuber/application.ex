@@ -12,7 +12,6 @@ defmodule XUber.Application do
       XUber.Grid,
       XUber.UserSupervisor,
       XUber.DispatcherSupervisor,
-      XUber.PickupSupervisor,
       XUber.RideSupervisor
     ]
 
